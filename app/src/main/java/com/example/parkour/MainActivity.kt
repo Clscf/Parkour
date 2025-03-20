@@ -94,11 +94,17 @@ fun MainScreen() {
     val navController = rememberNavController()
     val courseApiService = remember { createCourseApiService() }
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { HomeScreen(navController) }
+        composable("home") {
+            HomeScreen(navController)
+            DisplayCompetitions(
+                courseApiService = courseApiService
+            )
+        }
         composable("createCompetition") {
             CreateCompetitionScreen(
                 courseApiService = courseApiService
             )
+
         }
     }
 }
@@ -126,6 +132,57 @@ fun HomeScreen(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
+@Composable
+fun DisplayCompetitions(courseApiService: CourseApiService) {
+    var competitions by remember { mutableStateOf<List<Competitions>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            competitions = courseApiService.getCompetitions()
+            errorMessage = null
+        } catch (e: Exception) {
+            errorMessage = "Erreur lors de la récupération des compétitions : ${e.message}"
+            Log.e("DisplayCompetitions", "Erreur", e)
+        } finally {
+            isLoading = false
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        Text(
+            text = "Compétitions disponibles",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        if (isLoading) {
+            Text("Chargement des compétitions...")
+        } else if (errorMessage != null) {
+            Text("Erreur : $errorMessage")
+        } else {
+            LazyColumn {
+                items(competitions) { competition ->
+                    CompetitionItem(competition)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompetitionItem(competitions: Competitions) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = competitions.name, style = MaterialTheme.typography.bodyLarge)
+    }
+}
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
