@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -133,58 +134,124 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Composable
 fun CreateCompetitionScreen(courseApiService: CourseApiService) {
     var courses by remember { mutableStateOf<List<Course>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoadingCourses by remember { mutableStateOf(true) }
+    var errorMessageCourses by remember { mutableStateOf<String?>(null) }
+    var selectedCourseId by remember { mutableStateOf<Int?>(null) }
+    var obstacles by remember { mutableStateOf<List<Obstacle>>(emptyList()) }
+    var isLoadingObstacles by remember { mutableStateOf(false) }
+    var errorMessageObstacles by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(key1 = true) {
-        isLoading = true
+        isLoadingCourses = true
         try {
             courses = courseApiService.getCourses()
-            errorMessage = null
+            errorMessageCourses = null
         } catch (e: Exception) {
-            errorMessage = "Erreur lors de la récupération des courses : ${e.message}"
+            errorMessageCourses = "Erreur lors de la récupération des courses : ${e.message}"
             Log.e("CreateCompetitionScreen", "Erreur lors de la récupération des courses", e)
         } finally {
-            isLoading = false
+            isLoadingCourses = false
         }
     }
+    LaunchedEffect(key1 = selectedCourseId) {
+        if (selectedCourseId != null) {
+            isLoadingObstacles = true
+            try {
+                obstacles = courseApiService.getObstaclesForCourse(selectedCourseId!!)
+                errorMessageObstacles = null
+            } catch (e: Exception) {
+                errorMessageObstacles = "Erreur lors de la récupération des obstacles : ${e.message}"
+                Log.e("CreateCompetitionScreen", "Erreur lors de la récupération des obstacles", e)
+            } finally {
+                isLoadingObstacles = false
+            }
+        } else {
+            obstacles = emptyList()
+        }
+    }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "Sélectionnez les courses pour la compétition",
+            modifier = Modifier.padding(16.dp),
+            style = MaterialTheme.typography.headlineSmall
+        )
 
-    if (isLoading) {
-        Text("Chargement...")
-    } else if (errorMessage != null) {
-        Text("Erreur : $errorMessage")
-    } else {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
         ) {
+            if (isLoadingCourses) {
+                Text("Chargement des courses...")
+            } else if (errorMessageCourses != null) {
+                Text("Erreur : $errorMessageCourses")
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(courses) { course ->
+                        CourseItem(
+                            course = course,
+                            onCourseSelected = { isChecked ->
+                                course.isSelected = isChecked
+                                if (isChecked) {
+                                    selectedCourseId = course.id
+                                } else {
+                                    selectedCourseId = null
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+        }
+        if (selectedCourseId != null) {
             Text(
-                text = "Sélectionnez les courses pour la compétition",
+                text = "Sélectionnez les obstacles pour la course",
                 modifier = Modifier.padding(16.dp),
                 style = MaterialTheme.typography.headlineSmall
             )
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(courses) { course ->
-                    CourseItem(course = course, onCourseSelected = { isChecked ->
-                        course.isSelected = isChecked
-                    })
+            androidx.compose.foundation.layout.Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+            ) {
+                if (isLoadingObstacles) {
+                    Text("Chargement des obstacles...")
+                } else if (errorMessageObstacles != null) {
+                    Text("Erreur : $errorMessageObstacles")
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(obstacles) { obstacle ->
+                            ObstacleItem(
+                                obstacle = obstacle,
+                                onObstacleSelected = { isChecked ->
+                                    obstacle.isSelected = isChecked
+                                }
+                            )
+                        }
+                    }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Button(onClick = {
-
-                val selectedCourses = courses.filter { it.isSelected }
-                // Ajouter ici le code pour faire quelque chose avec les courses sélectionnées
-            }) {
-                Text("Valider")
-            }
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Button(onClick = {
+            val selectedCourses = courses.filter { it.isSelected }
+            val selectedObstacles = obstacles.filter { it.isSelected }
+            // Ajouter ici le code pour traiter les courses sélectionnées
+        }) {
+            Text("Valider")
         }
     }
 }
+
 
 @Composable
 fun CourseItem(course: Course, onCourseSelected: (Boolean) -> Unit) {
@@ -202,6 +269,25 @@ fun CourseItem(course: Course, onCourseSelected: (Boolean) -> Unit) {
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(text = course.name)
+    }
+}
+
+@Composable
+fun ObstacleItem(obstacle: Obstacle, onObstacleSelected: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = obstacle.isSelected,
+            onCheckedChange = { isChecked ->
+                onObstacleSelected(isChecked)
+            }
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(text = obstacle.obstacleName)
     }
 }
 
