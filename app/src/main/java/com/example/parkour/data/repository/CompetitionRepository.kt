@@ -1,6 +1,5 @@
 package com.example.parkour.data.repository
 
-import androidx.compose.animation.scaleOut
 import com.example.parkour.data.model.CompetitionCreate
 import com.example.parkour.data.model.Competitions
 import com.example.parkour.data.model.Course
@@ -8,6 +7,7 @@ import com.example.parkour.data.model.Obstacle
 import com.example.parkour.network.ApiService
 import retrofit2.Response
 import android.util.Log
+import com.example.parkour.data.model.CompetitionUpdate
 
 
 class CompetitionRepository(private val apiService: ApiService) {
@@ -36,4 +36,13 @@ class CompetitionRepository(private val apiService: ApiService) {
             throw Exception("Erreur lors de l'ajout de la compétition : ${response.message()}")
         }
     }
+
+    suspend fun deleteCompetition(competitionId: Int) {
+        apiService.deleteCompetition(competitionId) // Appel à l'API pour supprimer
+    }
+
+    suspend fun updateCompetition(updatedCompetition: CompetitionUpdate) {
+        apiService.updateCompetition(updatedCompetition.id, updatedCompetition)
+    }
+
 }

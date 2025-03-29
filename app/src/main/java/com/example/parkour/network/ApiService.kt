@@ -1,6 +1,7 @@
 package com.example.parkour.network
 
 import com.example.parkour.data.model.CompetitionCreate
+import com.example.parkour.data.model.CompetitionUpdate
 import com.example.parkour.data.model.Competitions
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
@@ -22,4 +23,11 @@ interface ApiService {
 
     @POST("/api/competitions")
     suspend fun addCompetition(@Body competitionCreate: CompetitionCreate): Response<CompetitionCreate>
+
+    @DELETE("competitions/{id}")
+    suspend fun deleteCompetition(@Path("id") competitionId: Int)
+
+    @PUT("competitions/{id}")
+    suspend fun updateCompetition(@Path("id") competitionId: Int, @Body updatedCompetition: CompetitionUpdate)
+
 }
