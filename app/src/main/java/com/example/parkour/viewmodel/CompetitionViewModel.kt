@@ -1,5 +1,6 @@
 package com.example.parkour.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parkour.data.model.CompetitionCreate
@@ -43,9 +44,11 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     fun addCompetition(competitionCreate: CompetitionCreate) {
         viewModelScope.launch {
             try {
+                Log.d("TAG", "Envoi de la compétition: $competitionCreate")
                 val addedCompetition = repository.addCompetition(competitionCreate)
             } catch (e: Exception) {
-                println("pas creer")
+                Log.d("TAG", "Message de débogage avec Log.d")
+
             }
         }
     }

@@ -7,6 +7,8 @@ import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
 import com.example.parkour.network.ApiService
 import retrofit2.Response
+import android.util.Log
+
 
 class CompetitionRepository(private val apiService: ApiService) {
 
@@ -26,10 +28,12 @@ class CompetitionRepository(private val apiService: ApiService) {
         val response: Response<CompetitionCreate> = apiService.addCompetition(competition)
 
         if (response.isSuccessful) {
-            return response.body() ?: throw Exception("La compétition n'a pas pu être ajoutée.")
+            val body = response.body() ?: throw Exception("La compétition n'a pas pu être ajoutée.")
+            Log.d("TAG", "Compétition créée avec succès : $body")
+            return body
         } else {
+            Log.e("TAG", "Erreur HTTP : ${response.code()} - ${response.errorBody()?.string()}")
             throw Exception("Erreur lors de l'ajout de la compétition : ${response.message()}")
         }
-        println("c'est bien crée")
     }
 }
