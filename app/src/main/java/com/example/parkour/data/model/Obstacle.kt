@@ -1,4 +1,4 @@
-package com.example.parkour
+package com.example.parkour.data.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
