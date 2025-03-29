@@ -1,13 +1,10 @@
-package com.example.parkour.data.model
+package com.example.parkour.data.model.uptdate
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Course(
-    val id: Int,
-    @SerialName("created_at") val createdAt: String,
-    @SerialName("updated_at") val updatedAt: String,
+data class CourseUpdate(
     val name: String,
     @SerialName("max_duration") val maxDuration: Int,
     val position: Int,

@@ -4,9 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Obstacle(
+data class CourseObstacle(
     val id: Int,
-    @SerialName("created_at") val createdAt: String,
-    @SerialName("updated_at") val updatedAt: String,
-    val name: String
+    @SerialName("obstacle_name") val obstacleName: String,
+    val position: Int
 )

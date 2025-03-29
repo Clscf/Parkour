@@ -7,10 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.parkour.data.model.Competitions
+import com.example.parkour.data.model.Competition
 
 @Composable
-fun CompetitionItem(competition: Competitions) {
+fun CompetitionItem(competition: Competition) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

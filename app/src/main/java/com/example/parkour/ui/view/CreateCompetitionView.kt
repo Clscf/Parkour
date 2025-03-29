@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.parkour.data.model.CompetitionCreate
+import com.example.parkour.data.model.create.CompetitionCreate
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
 @Composable
