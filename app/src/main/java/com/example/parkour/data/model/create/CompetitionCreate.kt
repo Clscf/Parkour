@@ -8,6 +8,6 @@ data class CompetitionCreate(
     val name: String,
     @SerialName("age_min") val ageMin: Int,
     @SerialName("age_max") val ageMax: Int,
-    val gender: Char,
+    val gender: String,
     @SerialName("has_retry") val hasRetry: Int
 )

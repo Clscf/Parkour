@@ -4,11 +4,11 @@ import com.example.parkour.data.model.*
 import com.example.parkour.data.model.create.*
 import com.example.parkour.data.model.uptdate.*
 import com.example.parkour.data.model.uptdate.PerformanceUpdate
-
-import retrofit2.Response
 import retrofit2.http.*
+import retrofit2.Response
 
 interface ApiService {
+
 
     @GET("/api/competitions")
     suspend fun getCompetitions(): Response<List<Competition>>
@@ -141,4 +141,3 @@ interface ApiService {
     @GET("/api/performances/{id}/details")
     suspend fun getPerformanceDetails(@Path("id") id: Int): Response<List<PerformanceObstacle>>
 }
-

@@ -7,6 +7,7 @@ import com.example.parkour.data.model.create.CompetitionCreate
 import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
+import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.repository.CompetitionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +27,9 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     private val _selectedCourseId = MutableStateFlow<Int?>(null)
     val selectedCourseId: StateFlow<Int?> = _selectedCourseId
 
+    private val _competitionDeleted = MutableStateFlow(false)
+    val competitionDeleted: StateFlow<Boolean> = _competitionDeleted
+
     init {
         loadCompetitions()
         //loadCourses()
@@ -41,11 +45,11 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                     Log.e("CompetitionViewModel", "Erreur API : ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.e("CompetitionViewModel", "Exception : ${e.message}")
+                Log.e("CompetitionViewModel", "Erreur API :")
+
             }
         }
     }
-
 
     fun addCompetition(competitionCreate: CompetitionCreate) {
         viewModelScope.launch {
@@ -57,8 +61,6 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                 if (response.isSuccessful) {
                     response.body()?.let { newCompetition ->
                         Log.d("CompetitionViewModel", "Compétition ajoutée avec succès : $newCompetition")
-
-                        // Ajouter la nouvelle compétition à la liste actuelle sans recharger toutes les compétitions
                         _competitions.value = _competitions.value + newCompetition
                     }
                 } else {
@@ -70,5 +72,57 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
             }
         }
     }
+
+
+    fun deleteCompetition(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.deleteCompetition(competitionId)
+                if (response.isSuccessful) {
+                    _competitions.value = _competitions.value.filterNot { it.id == competitionId }
+                    _competitionDeleted.value = true
+                    Log.d("CompetitionViewModel", "Compétition supprimée avec succès")
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la suppression de la compétition : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la suppression de la compétition : ${e.message}")
+            }
+        }
+    }
+
+    fun resetDeletionState() {
+        _competitionDeleted.value = false
+    }
+
+    fun updateCompetition(competitionId: Int, updatedCompetition: CompetitionUpdate) {
+        viewModelScope.launch {
+            try {
+                val response = repository.updateCompetition(competitionId, updatedCompetition)
+
+                if (response.isSuccessful) {
+                    _competitions.value = _competitions.value.map {
+                        if (it.id == competitionId) {
+                            it.copy(
+                                name = updatedCompetition.name,
+                                ageMin = updatedCompetition.ageMin,
+                                ageMax = updatedCompetition.ageMax,
+                                gender = updatedCompetition.gender,
+                                status = updatedCompetition.status
+                            )
+                        } else {
+                            it
+                        }
+                    }
+                    Log.d("CompetitionViewModel", "Compétition mise à jour avec succès")
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")
+            }
+        }
+    }
+
 
 }

@@ -6,6 +6,7 @@ import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.network.ApiService
 import retrofit2.Response
 
+
 class CompetitionRepository(private val apiService: ApiService) {
 
     suspend fun getCompetitions(): Response<List<Competition>> {
@@ -23,6 +24,7 @@ class CompetitionRepository(private val apiService: ApiService) {
     suspend fun updateCompetition(id: Int, competitionUpdate: CompetitionUpdate): Response<Competition> {
         return apiService.updateCompetition(id, competitionUpdate)
     }
+
 
     suspend fun deleteCompetition(id: Int): Response<Unit> {
         return apiService.deleteCompetition(id)

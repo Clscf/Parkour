@@ -4,36 +4,30 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.parkour.data.model.create.CompetitionCreate
+import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
 @Composable
-fun CreateCompetitionView(
+fun UpdateCompetitionView(
     viewModel: CompetitionViewModel,
-    navController: NavController
+    navController: NavController,
+    competition: CompetitionUpdate,
+    competitionId: Int
 ) {
-    val competitions by viewModel.competitions.collectAsState() // Liste des compétitions existantes
-
-    var name by remember { mutableStateOf("") }
-    var nameError by remember { mutableStateOf(false) } // Gérer l'erreur
-    var ageMin by remember { mutableStateOf(18) }
-    var ageMax by remember { mutableStateOf(30) }
-    var gender by remember { mutableStateOf("Gender") }
+    var name by remember { mutableStateOf(competition.name) }
+    var ageMin by remember { mutableStateOf(competition.ageMin) }
+    var ageMax by remember { mutableStateOf(competition.ageMax) }
+    var gender by remember { mutableStateOf(competition.gender) }
     var expandedGender by remember { mutableStateOf(false) }
-    var hasTry by remember { mutableStateOf(0) }
+    var hasRetry by remember { mutableStateOf(competition.hasRetry) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Option 1") }
+    val selectedOption = if (hasRetry == 1) "Oui" else "Non"
 
     Column(
         modifier = Modifier
@@ -42,34 +36,22 @@ fun CreateCompetitionView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Créer une compétition", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Modifier la compétition", style = MaterialTheme.typography.headlineMedium)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         TextField(
             value = name,
-            onValueChange = {
-                name = it
-                nameError = competitions.any { competition -> competition.name == it }
-            },
+            onValueChange = { name = it },
             label = { Text("Nom de la compétition") },
-            modifier = Modifier.fillMaxWidth(),
-            isError = nameError
+            modifier = Modifier.fillMaxWidth()
         )
-
-        if (nameError) {
-            Text(
-                text = "Ce nom est déjà pris !",
-                color = Color.Red,
-                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
             value = ageMin.toString(),
-            onValueChange = { ageMin = it.toIntOrNull() ?: 18 },
+            onValueChange = { ageMin = it.toIntOrNull() ?: competition.ageMin },
             label = { Text("Âge minimum") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -78,7 +60,7 @@ fun CreateCompetitionView(
 
         TextField(
             value = ageMax.toString(),
-            onValueChange = { ageMax = it.toIntOrNull() ?: 30 },
+            onValueChange = { ageMax = it.toIntOrNull() ?: competition.ageMax },
             label = { Text("Âge maximum") },
             modifier = Modifier.fillMaxWidth()
         )
@@ -131,14 +113,14 @@ fun CreateCompetitionView(
                 DropdownMenuItem(
                     text = { Text("Oui") },
                     onClick = {
-                        selectedOption = "true"
+                        hasRetry = 1
                         expanded = false
                     }
                 )
                 DropdownMenuItem(
                     text = { Text("Non") },
                     onClick = {
-                        selectedOption = "false"
+                        hasRetry = 0
                         expanded = false
                     }
                 )
@@ -149,26 +131,26 @@ fun CreateCompetitionView(
 
         Button(
             onClick = {
-                val competition = CompetitionCreate(
+                val updatedCompetition = CompetitionUpdate(
                     name = name,
                     ageMin = ageMin,
                     ageMax = ageMax,
                     gender = gender,
-                    hasRetry = hasTry
+                    hasRetry = hasRetry,
+                    status = competition.status
                 )
-                viewModel.addCompetition(competition)
+                viewModel.updateCompetition(competitionId, updatedCompetition) // Passer l'ID ici
                 navController.popBackStack()
             },
-            enabled = !nameError && name.isNotBlank(), // Désactive si le nom est invalide
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Créer la compétition")
+            Text("Mettre à jour la compétition")
         }
 
         Button(onClick = {
             navController.popBackStack()
         }) {
-            Text("Retour")
+            Text("Annuler")
         }
     }
 }
