@@ -4,6 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,19 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
+import com.example.parkour.viewmodel.CourseViewModel
+import com.example.parkour.ui.items.CourseItem
 import androidx.compose.runtime.collectAsState
 import com.example.parkour.data.model.Competition
-import com.example.parkour.data.model.Course
 
 @Composable
-fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
+fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, navController: NavController) {
     val competitions = viewModel.competitions.collectAsState().value
     val courses = viewModel.courses.collectAsState().value
     val competitionDeleted = viewModel.competitionDeleted.collectAsState().value
     var expanded by remember { mutableStateOf(false) }
     var selectedCompetition by remember { mutableStateOf<Competition?>(null) }
 
-    // Réinitialisation automatique après suppression
     if (competitionDeleted) {
         selectedCompetition = null
         viewModel.resetDeletionState()
@@ -31,9 +34,7 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
+            modifier = Modifier.padding(innerPadding).fillMaxSize(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -66,7 +67,7 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
                             text = { Text(competition.name) },
                             onClick = {
                                 selectedCompetition = competition
-                                viewModel.loadCoursesForCompetition(competition.id) // Charger les courses associées
+                                viewModel.loadCoursesForCompetition(competition.id)
                                 expanded = false
                             }
                         )
@@ -75,13 +76,9 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
 
                 selectedCompetition?.let { competition ->
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        // Affichage des courses associées
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
@@ -101,12 +98,14 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
 
                         if (courses.isNotEmpty()) {
                             LazyColumn(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(8.dp)
+                                modifier = Modifier.fillMaxWidth().padding(8.dp)
                             ) {
                                 items(courses) { course ->
-                                    Text("- ${course.name} (Durée max : ${course.maxDuration} min)")
+                                    CourseItem(
+                                        course = course,
+                                        onEdit = { navController.navigate("updateCourse/${course.id}") },
+                                        onDelete = { courseViewModel.deleteCourse(course.id) }
+                                    )
                                 }
                             }
                         } else {
@@ -116,9 +115,7 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 8.dp),
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Button(
