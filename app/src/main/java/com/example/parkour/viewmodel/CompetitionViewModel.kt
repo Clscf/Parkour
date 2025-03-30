@@ -5,8 +5,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parkour.data.model.create.CompetitionCreate
 import com.example.parkour.data.model.Competition
+import com.example.parkour.data.model.Competitor
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
+import com.example.parkour.data.model.create.CompetitorCreate
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.repository.CompetitionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +19,9 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
 
     private val _competitions = MutableStateFlow<List<Competition>>(emptyList())
     val competitions: StateFlow<List<Competition>> = _competitions
+
+    private val _competitors = MutableStateFlow<List<Competitor>>(emptyList())
+    val competitors: StateFlow<List<Competitor>> = _competitors
 
     private val _courses = MutableStateFlow<List<Course>>(emptyList())
     val courses: StateFlow<List<Course>> = _courses
@@ -111,6 +116,40 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                 Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")            }
         }
     }
+
+    fun loadCompetitionCompetitors(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCompetitionCompetitors(competitionId)
+                if (response.isSuccessful) {
+                    _competitors.value = response.body() ?: emptyList()
+                    Log.d("CompetitionViewModel", "Compétiteurs chargés avec succès")
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur : ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur API :", e)
+            }
+        }
+    }
+
+    fun addCompetitorToCompetition(competitionId: Int, competitor: CompetitorCreate) {
+        viewModelScope.launch {
+            try {
+                val response = repository.addCompetitorToCompetition(competitionId, competitor)
+                if (response.isSuccessful) {
+                    Log.d("CompetitionViewModel", "Compétiteur ajouté avec succès")
+                    loadCompetitionCompetitors(competitionId)
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de l'ajout du compétiteur : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de l'ajout du compétiteur : ${e.message}")
+            }
+        }
+    }
+
+
 
 
 }
