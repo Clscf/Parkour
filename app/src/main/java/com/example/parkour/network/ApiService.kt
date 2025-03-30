@@ -48,7 +48,7 @@ interface ApiService {
     suspend fun getCompetitor(@Path("id") id: Int): Response<Competitor>
 
     @PUT("/api/competitors/{id}")
-    suspend fun updateCompetitor(@Path("id") id: Int, @Body competitor: CompetitorUpdate): Response<Competitor>
+    suspend fun updateCompetitor(@Path("id") id: Int, @Body competitor: CompetitorUpdate): Response<Unit>
 
     @DELETE("/api/competitors/{id}")
     suspend fun deleteCompetitor(@Path("id") id: Int): Response<Unit>
@@ -73,7 +73,7 @@ interface ApiService {
     suspend fun getCourse(@Path("id") id: Int): Response<Course>
 
     @PUT("/api/courses/{id}")
-    suspend fun updateCourse(@Path("id") id: Int, @Body course: CourseUpdate): Response<Course>
+    suspend fun updateCourse(@Path("id") id: Int, @Body course: CourseUpdate): Response<Unit>
 
     @DELETE("/api/courses/{id}")
     suspend fun deleteCourse(@Path("id") id: Int): Response<Unit>
@@ -104,7 +104,7 @@ interface ApiService {
     suspend fun getObstacle(@Path("id") id: Int): Response<Obstacle>
 
     @PUT("/api/obstacles/{id}")
-    suspend fun updateObstacle(@Path("id") id: Int, @Body obstacle: ObstacleUpdate): Response<Obstacle>
+    suspend fun updateObstacle(@Path("id") id: Int, @Body obstacle: ObstacleUpdate): Response<Unit>
 
     @DELETE("/api/obstacles/{id}")
     suspend fun deleteObstacle(@Path("id") id: Int): Response<Unit>
@@ -120,7 +120,7 @@ interface ApiService {
     suspend fun getPerformanceObstacle(@Path("id") id: Int): Response<PerformanceObstacle>
 
     @PUT("/api/performance_obstacles/{id}")
-    suspend fun updatePerformanceObstacle(@Path("id") id: Int, @Body performanceObstacle: PerformanceObstacleUpdate): Response<PerformanceObstacle>
+    suspend fun updatePerformanceObstacle(@Path("id") id: Int, @Body performanceObstacle: PerformanceObstacleUpdate): Response<Unit>
 
     // Performances
     @GET("/api/performances")
@@ -133,7 +133,7 @@ interface ApiService {
     suspend fun getPerformance(@Path("id") id: Int): Response<Performance>
 
     @PUT("/api/performances/{id}")
-    suspend fun updatePerformance(@Path("id") id: Int, @Body performance: PerformanceUpdate): Response<Performance>
+    suspend fun updatePerformance(@Path("id") id: Int, @Body performance: PerformanceUpdate): Response<Unit>
 
     @DELETE("/api/performances/{id}")
     suspend fun deletePerformance(@Path("id") id: Int): Response<Unit>

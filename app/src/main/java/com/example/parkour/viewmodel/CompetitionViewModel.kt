@@ -54,8 +54,6 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     fun addCompetition(competitionCreate: CompetitionCreate) {
         viewModelScope.launch {
             try {
-                Log.d("CompetitionViewModel", "Envoi de la compétition : $competitionCreate")
-
                 val response = repository.addCompetition(competitionCreate)
 
                 if (response.isSuccessful) {
@@ -101,34 +99,15 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
 
 
             try {
-                Log.d("Tryt", "Compétition qui rentre dans le try mise à jour avec succès")
 
                 val response = repository.updateCompetition(competitionId, updatedCompetition)
-                Log.d("Tryt", "Compétition mise à jour avec succès")
-
-
-
                 if (response.isSuccessful) {
                     Log.d("CompetitionViewModel", "Compétition mise à jour avec succès")
-                    loadCompetitions() // <-- Recharge la liste depuis l'API
+                    loadCompetitions()
                 } else {
-                    Log.d("CompetitionViewModel", "Réponse API : ${response.body()}")
                     Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-
-                _competitions.value.forEach { competition ->
-                    Log.d("CompetitionViewModel", "Compétition ID: ${competition.id}, " +
-                            "Name: ${competition.name}, " +
-                            "date:  ${competition.createdAt} "+
-                            "date update:  ${competition.updatedAt} "+
-                            "Age Min: ${competition.ageMin}, " +
-                            "Age Max: ${competition.ageMax}, " +
-                            "Gender: ${competition.gender}, " +
-                            "Has Retry: ${competition.hasRetry}, " +
-                            "Status: ${competition.status}")
-                }
-
                 Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")            }
         }
     }
