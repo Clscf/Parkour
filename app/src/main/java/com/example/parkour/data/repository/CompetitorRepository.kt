@@ -20,7 +20,7 @@ class CompetitorRepository(private val apiService: ApiService) {
         return apiService.getCompetitor(id)
     }
 
-    suspend fun updateCompetitor(id: Int, competitorUpdate: CompetitorUpdate): Response<Competitor> {
+    suspend fun updateCompetitor(id: Int, competitorUpdate: CompetitorUpdate): Response<Unit> {
         return apiService.updateCompetitor(id, competitorUpdate)
     }
 

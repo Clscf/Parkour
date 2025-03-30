@@ -20,7 +20,7 @@ class CourseRepository(private val apiService: ApiService) {
         return apiService.getCourse(id)
     }
 
-    suspend fun updateCourse(id: Int, courseUpdate: CourseUpdate): Response<Course> {
+    suspend fun updateCourse(id: Int, courseUpdate: CourseUpdate): Response<Unit> {
         return apiService.updateCourse(id, courseUpdate)
     }
 

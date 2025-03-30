@@ -20,7 +20,7 @@ class ObstacleRepository(private val apiService: ApiService) {
         return apiService.getObstacle(id)
     }
 
-    suspend fun updateObstacle(id: Int, obstacleUpdate: ObstacleUpdate): Response<Obstacle> {
+    suspend fun updateObstacle(id: Int, obstacleUpdate: ObstacleUpdate): Response<Unit> {
         return apiService.updateObstacle(id, obstacleUpdate)
     }
 

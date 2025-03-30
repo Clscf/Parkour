@@ -20,7 +20,7 @@ class PerformanceRepository(private val apiService: ApiService) {
         return apiService.getPerformance(id)
     }
 
-    suspend fun updatePerformance(id: Int, performanceUpdate: PerformanceUpdate): Response<Performance> {
+    suspend fun updatePerformance(id: Int, performanceUpdate: PerformanceUpdate): Response<Unit> {
         return apiService.updatePerformance(id, performanceUpdate)
     }
 
