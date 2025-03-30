@@ -38,6 +38,11 @@ fun AppNavigation() {
         composable("home") {
             HomeView(competitionViewModel, courseViewModel,navController)
         }
+        // Page d'accueil avec le nom de la compétition passée en paramètre
+        /*composable("home/{competitionName}") { backStackEntry ->
+            val competitionName = backStackEntry.arguments?.getString("competitionName") ?: ""
+            HomeView(competitionViewModel, courseViewModel, navController, competitionName)
+        }*/
 
         // Page de création de compétition
         composable("createCompetition") {
@@ -87,10 +92,14 @@ fun AppNavigation() {
                 courseId = courseId
             )
         }
+
+        // Page de création de course
         composable("createCourse/{competitionId}") { backStackEntry ->
             val competitionId = backStackEntry.arguments?.getString("competitionId")?.toIntOrNull() ?: 0
             CreateCourseView(competitionViewModel, navController, competitionId)
         }
+
+        // Page de mise à jour de course
         composable(
             "updateCourse/{courseId}",
             arguments = listOf(navArgument("courseId") { type = NavType.IntType })
@@ -98,7 +107,5 @@ fun AppNavigation() {
             val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
             UpdateCourseView(courseId = courseId, viewModel = courseViewModel, navController = navController)
         }
-
-
     }
 }

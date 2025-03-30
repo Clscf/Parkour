@@ -53,5 +53,10 @@ class CompetitionRepository(private val apiService: ApiService) {
         return apiService.addCompetitorToCompetition(competitionId, competitor)
     }
 
+    suspend fun getCourse(): Response<List<Course>> {
+        return apiService.getCourses()
+
+    }
+
 
 }
