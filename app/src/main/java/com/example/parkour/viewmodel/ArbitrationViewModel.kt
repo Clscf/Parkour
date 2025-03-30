@@ -1,4 +1,4 @@
-package com.example.parkour.ui.viewmodel
+package com.example.parkour.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

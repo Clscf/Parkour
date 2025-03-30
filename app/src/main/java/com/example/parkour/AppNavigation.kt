@@ -1,4 +1,4 @@
-package com.example.parkour.ui.screen
+package com.example.parkour
 
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
@@ -8,7 +8,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.parkour.HomeView
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.data.repository.ArbitrationRepository
 import com.example.parkour.network.RetrofitInstance
@@ -16,7 +15,7 @@ import com.example.parkour.repository.CompetitionRepository
 import com.example.parkour.ui.view.ArbitrationView
 import com.example.parkour.ui.view.CreateCompetitionView
 import com.example.parkour.ui.view.UpdateCompetitionView
-import com.example.parkour.ui.viewmodel.ArbitrationViewModel
+import com.example.parkour.viewmodel.ArbitrationViewModel
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -64,7 +63,7 @@ fun AppNavigation() {
             }
         }
 
-        // Page d'arbitrage
+        // Page arbitrage
         composable(
             "arbitration/{competitionId}/{courseId}",
             arguments = listOf(
