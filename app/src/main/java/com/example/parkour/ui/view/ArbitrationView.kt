@@ -2,6 +2,8 @@ package com.example.parkour.ui.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,13 +16,13 @@ import com.example.parkour.viewmodel.ArbitrationViewModel
 @Composable
 fun ArbitrationView(
     viewModel: ArbitrationViewModel,
-    navController: NavController,
-    competitionId: Int,
-    courseId: Int
+    navController: NavController
 ) {
-    val obstacles by viewModel.obstacles.collectAsState() // Liste des obstacles du parcours
-    var elapsedTime by remember { mutableStateOf(0L) } // Chronométrage
-    var isTimerRunning by remember { mutableStateOf(false) } // État du chronomètre
+    val competitions by viewModel.competitions.collectAsState()
+    val competitors by viewModel.competitors.collectAsState()
+    val obstacles by viewModel.obstacles.collectAsState()
+    var elapsedTime by remember { mutableStateOf(0L) }
+    var isTimerRunning by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -29,11 +31,34 @@ fun ArbitrationView(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Arbitrage du parcours $courseId", style = MaterialTheme.typography.headlineMedium)
+        Text(text = "Arbitrage", style = MaterialTheme.typography.headlineMedium)
 
+        // Sélectionner la compétition
+        Text("Sélectionner une compétition")
+        LazyColumn {
+            items(competitions) { competition ->
+                Button(onClick = {
+                    viewModel.loadCompetitors()
+                    viewModel.selectCourse(competition.id)
+                }) {
+                    Text("Compétition: ${competition.name}")
+                }
+            }
+        }
+
+        // Sélectionner un compétiteur
         Spacer(modifier = Modifier.height(16.dp))
+        Text("Sélectionner un compétiteur")
+        LazyColumn {
+            items(competitors) { competitor ->
+                Button(onClick = { viewModel.selectCompetitor(competitor.id) }) {
+                    Text("Compétiteur: ${competitor.firstName}")
+                }
+            }
+        }
 
-        // Timer Display
+        // Timer
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = String.format(
                 "Temps écoulé : %02d:%02d.%02d",
@@ -44,9 +69,6 @@ fun ArbitrationView(
             style = MaterialTheme.typography.bodyLarge
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Control Buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -57,46 +79,36 @@ fun ArbitrationView(
             }) {
                 Text("Démarrer")
             }
-
             Button(onClick = {
                 isTimerRunning = false
                 viewModel.stopTimer()
             }) {
                 Text("Arrêter")
             }
-
             Button(onClick = {
-                viewModel.registerPerformance(
-                    elapsedTime.toDouble(),
-                    hasFell = true // Enregistre une chute
-                )
+                viewModel.registerPerformance(elapsedTime.toDouble(), hasFell = true)
             }) {
                 Text("Chute")
             }
         }
 
+        // Obstacle suivant
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Obstacle navigation
         Button(
-            onClick = {
-                viewModel.moveToNextObstacle()
-            },
+            onClick = { viewModel.moveToNextObstacle() },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Obstacle suivant")
         }
 
+        // Liste des obstacles
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Display List of Obstacles
         Text(text = "Liste des obstacles", style = MaterialTheme.typography.bodyLarge)
         obstacles.forEach { obstacle ->
             Text(text = "- Obstacle ID: ${obstacle.id}")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
         Button(onClick = { navController.popBackStack() }) {
             Text("Retour")
         }

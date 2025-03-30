@@ -88,8 +88,6 @@ fun AppNavigation() {
             ArbitrationView(
                 viewModel = arbitrationViewModel,
                 navController = navController,
-                competitionId = competitionId,
-                courseId = courseId
             )
         }
 
