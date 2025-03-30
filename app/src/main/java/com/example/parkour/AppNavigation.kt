@@ -13,6 +13,7 @@ import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.network.RetrofitInstance
 import com.example.parkour.repository.CompetitionRepository
 import com.example.parkour.ui.view.CreateCompetitionView
+import com.example.parkour.ui.view.CreateCourseView
 import com.example.parkour.ui.view.UpdateCompetitionView
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
@@ -53,5 +54,10 @@ fun AppNavigation() {
                 )
             }
         }
+        composable("createCourse/{competitionId}") { backStackEntry ->
+            val competitionId = backStackEntry.arguments?.getString("competitionId")?.toIntOrNull() ?: 0
+            CreateCourseView(competitionViewModel, navController, competitionId)
+        }
+
     }
 }

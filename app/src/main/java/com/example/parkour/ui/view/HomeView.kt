@@ -1,28 +1,11 @@
 package com.example.parkour
 
-import CompetitionItem
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,10 +13,12 @@ import androidx.navigation.NavController
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.parkour.data.model.Competition
+import com.example.parkour.data.model.Course
 
 @Composable
 fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
     val competitions = viewModel.competitions.collectAsState().value
+    val courses = viewModel.courses.collectAsState().value
     val competitionDeleted = viewModel.competitionDeleted.collectAsState().value
     var expanded by remember { mutableStateOf(false) }
     var selectedCompetition by remember { mutableStateOf<Competition?>(null) }
@@ -41,7 +26,7 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
     // Réinitialisation automatique après suppression
     if (competitionDeleted) {
         selectedCompetition = null
-        viewModel.resetDeletionState() // Reset après traitement
+        viewModel.resetDeletionState()
     }
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -81,21 +66,54 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
                             text = { Text(competition.name) },
                             onClick = {
                                 selectedCompetition = competition
-                                viewModel.loadCompetitions()
+                                viewModel.loadCoursesForCompetition(competition.id) // Charger les courses associées
                                 expanded = false
                             }
                         )
                     }
                 }
 
-                selectedCompetition?.let {
+                selectedCompetition?.let { competition ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("Compétition sélectionnée : ${it.name}")
+
+                        // Affichage des courses associées
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                "Courses associées :",
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            Button(
+                                onClick = { navController.navigate("createCourse/${competition.id}") },
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            ) {
+                                Text("+")
+                            }
+                        }
+
+                        if (courses.isNotEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp)
+                            ) {
+                                items(courses) { course ->
+                                    Text("- ${course.name} (Durée max : ${course.maxDuration} min)")
+                                }
+                            }
+                        } else {
+                            Text("Aucune course associée.", style = MaterialTheme.typography.bodyMedium)
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
 
                         Row(
                             modifier = Modifier
@@ -104,13 +122,13 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Button(
-                                onClick = { navController.navigate("updateCompetition/${it.id}") },
+                                onClick = { navController.navigate("updateCompetition/${competition.id}") },
                                 modifier = Modifier.padding(8.dp)
                             ) {
                                 Text("Modifier")
                             }
                             Button(
-                                onClick = { viewModel.deleteCompetition(it.id) },
+                                onClick = { viewModel.deleteCompetition(competition.id) },
                                 modifier = Modifier.padding(8.dp)
                             ) {
                                 Text("Supprimer")
@@ -131,6 +149,3 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
         }
     }
 }
-
-
-

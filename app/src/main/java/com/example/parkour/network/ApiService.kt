@@ -140,4 +140,5 @@ interface ApiService {
 
     @GET("/api/performances/{id}/details")
     suspend fun getPerformanceDetails(@Path("id") id: Int): Response<List<PerformanceObstacle>>
+
 }
