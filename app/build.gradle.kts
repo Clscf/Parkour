@@ -66,6 +66,22 @@ dependencies {
     implementation(libs.okhttp.v493)
     implementation(libs.kotlinx.serialization.json.v163)
     implementation(libs.retrofit2.kotlinx.serialization.converter.v080)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.runner)
+    implementation(libs.core.ktx)
+    implementation(libs.androidx.junit.ktx)
+    implementation(libs.core)
+
+    // Tests
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0") // API JUnit Jupiter
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0") // Moteur pour JUnit 5
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.0") // Lancer les tests avec JUnit 5
+
+    // Optionnel si vous exécutez aussi des tests Android
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    androidTestImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    androidTestRuntimeOnly("org.junit.platform:junit-platform-launcher:1.7.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

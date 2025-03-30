@@ -9,6 +9,7 @@ import com.example.parkour.data.model.Competitor
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
 import com.example.parkour.data.model.create.CompetitorCreate
+import com.example.parkour.data.model.create.CourseCreate
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.repository.CompetitionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -116,6 +117,40 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                 Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")            }
         }
     }
+
+    fun loadCoursesForCompetition(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCompetitionCourses(competitionId)
+                if (response.isSuccessful) {
+                    _courses.value = response.body() ?: emptyList()
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${e.message}")
+            }
+        }
+    }
+
+    fun addCourse(courseCreate: CourseCreate) {
+        viewModelScope.launch {
+            try {
+                val response = repository.addCourse(courseCreate)
+                if (response.isSuccessful) {
+                    Log.d("CompetitionViewModel", "Parcours ajouté avec succès : ${response.body()}")
+                    _courses.value += (response.body() ?: return@launch)
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de l'ajout du parcours : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Exception lors de l'ajout du parcours : ${e.message}")
+            }
+        }
+    }
+
+
+
 
     fun loadCompetitionCompetitors(competitionId: Int) {
         viewModelScope.launch {
