@@ -1,10 +1,11 @@
 package com.example.parkour.data.model
 
+import androidx.room.Entity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 
-@Serializable
+@Serializable @Entity
 data class Competition(
     val id: Int,
     @SerialName("created_at") val createdAt: String,
@@ -15,6 +16,7 @@ data class Competition(
     val gender: String,
     @SerialName("has_retry") val hasTry: Int,
     val status: String
+
 )
 
 

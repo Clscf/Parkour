@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.okhttp.v493)
     implementation(libs.kotlinx.serialization.json.v163)
     implementation(libs.retrofit2.kotlinx.serialization.converter.v080)
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
