@@ -22,16 +22,18 @@ object RetrofitInstance {
         .addInterceptor(authInterceptor)
         .build()
 
+    // Créez une instance de Json avec ignoreUnknownKeys activé
     private val json = Json {
-        ignoreUnknownKeys = true
+        ignoreUnknownKeys = true  // Ignore les clés inconnues dans la réponse
+        isLenient = true
+        coerceInputValues = true
     }
-
 
     private val retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))  // Utilisez la config Json avec ignoreUnknownKeys
             .build()
     }
 

@@ -20,7 +20,7 @@ interface ApiService {
     suspend fun getCompetition(@Path("id") id: Int): Response<Competition>
 
     @PUT("/api/competitions/{id}")
-    suspend fun updateCompetition(@Path("id") id: Int, @Body competition: CompetitionUpdate): Response<Competition>
+    suspend fun updateCompetition(@Path("id") id: Int, @Body competition: CompetitionUpdate): Response<Unit>
 
     @DELETE("/api/competitions/{id}")
     suspend fun deleteCompetition(@Path("id") id: Int): Response<Unit>

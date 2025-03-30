@@ -13,7 +13,7 @@ data class Competition(
     @SerialName("age_min") val ageMin: Int,
     @SerialName("age_max") val ageMax: Int,
     val gender: String,
-    @SerialName("has_retry") val hasTry: Int,
+    @SerialName("has_retry") val hasRetry: Int,
     val status: String
 )
 

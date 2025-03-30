@@ -1,5 +1,6 @@
 package com.example.parkour.repository
 
+import android.util.Log
 import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.create.CompetitionCreate
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
@@ -21,9 +22,10 @@ class CompetitionRepository(private val apiService: ApiService) {
         return apiService.getCompetition(id)
     }
 
-    suspend fun updateCompetition(id: Int, competitionUpdate: CompetitionUpdate): Response<Competition> {
+    suspend fun updateCompetition(id: Int, competitionUpdate: CompetitionUpdate): Response<Unit> {
         return apiService.updateCompetition(id, competitionUpdate)
     }
+
 
 
     suspend fun deleteCompetition(id: Int): Response<Unit> {

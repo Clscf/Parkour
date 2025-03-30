@@ -46,7 +46,7 @@ fun AppNavigation() {
                         ageMin = it.ageMin,
                         ageMax = it.ageMax,
                         gender = it.gender,
-                        hasRetry = it.hasTry,
+                        hasRetry = it.hasRetry,
                         status = it.status
                     ),
                     competitionId = it.id

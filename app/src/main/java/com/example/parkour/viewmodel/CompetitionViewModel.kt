@@ -40,13 +40,13 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
             try {
                 val response = repository.getCompetitions()
                 if (response.isSuccessful) {
+                    Log.d("API_RESPONSE", "Réponse brute : ${response.body()?.toString()}")
                     _competitions.value = response.body() ?: emptyList()
                 } else {
-                    Log.e("CompetitionViewModel", "Erreur API : ${response.code()} - ${response.message()}")
+                    Log.e("CompetitionViewModel", "Erreur : ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("CompetitionViewModel", "Erreur API :")
-
+                Log.e("CompetitionViewModel", "Erreur API :", e)
             }
         }
     }
@@ -99,8 +99,13 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
         viewModelScope.launch {
             Log.d("CompetitionViewModel", "Envoi de la mise à jour : $updatedCompetition")
 
+
             try {
+                Log.d("Tryt", "Compétition qui rentre dans le try mise à jour avec succès")
+
                 val response = repository.updateCompetition(competitionId, updatedCompetition)
+                Log.d("Tryt", "Compétition mise à jour avec succès")
+
 
 
                 if (response.isSuccessful) {
@@ -112,8 +117,19 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                 }
             } catch (e: Exception) {
 
-                Log.e("CompetitionViewModel", "Erreurrrrr lors de la mise à jour : ${e.message}")
-            }
+                _competitions.value.forEach { competition ->
+                    Log.d("CompetitionViewModel", "Compétition ID: ${competition.id}, " +
+                            "Name: ${competition.name}, " +
+                            "date:  ${competition.createdAt} "+
+                            "date update:  ${competition.updatedAt} "+
+                            "Age Min: ${competition.ageMin}, " +
+                            "Age Max: ${competition.ageMax}, " +
+                            "Gender: ${competition.gender}, " +
+                            "Has Retry: ${competition.hasRetry}, " +
+                            "Status: ${competition.status}")
+                }
+
+                Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")            }
         }
     }
 
