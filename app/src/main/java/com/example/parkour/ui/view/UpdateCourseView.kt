@@ -20,6 +20,10 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
     val course = courses.find { it.id == courseId }
     val obstacles = obstacleViewModel.obstacles.collectAsState().value
 
+    // Définir les variables d'état pour le nom et la durée de la course
+    var courseName by remember { mutableStateOf(course?.name ?: "") }
+    var maxDuration by remember { mutableStateOf(course?.maxDuration?.toString() ?: "") }
+
     // Charger les obstacles de la course
     LaunchedEffect(courseId) {
         courseViewModel.loadObstaclesForCourse(courseId)
@@ -43,8 +47,8 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                     // Nom de la course
                     OutlinedTextField(
-                        value = course.name,
-                        onValueChange = { /* Mettre à jour le nom si besoin */ },
+                        value = courseName,  // Utilisez courseName pour lier l'état
+                        onValueChange = { courseName = it },  // Met à jour courseName lorsqu'une modification est faite
                         label = { Text("Nom de la course") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -53,8 +57,8 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                     // Durée maximale de la course
                     OutlinedTextField(
-                        value = course.maxDuration.toString(),
-                        onValueChange = { /* Mettre à jour la durée si besoin */ },
+                        value = maxDuration,  // Utilisez maxDuration pour lier l'état
+                        onValueChange = { maxDuration = it },  // Met à jour maxDuration lorsqu'une modification est faite
                         label = { Text("Durée maximale (minutes)") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -80,7 +84,7 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                                     },
                                     modifier = Modifier.align(Alignment.CenterVertically)
                                 ) {
-                                    Text("Ajouter")
+                                    Text("+")
                                 }
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -113,8 +117,8 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                             onClick = {
                                 // Sauvegarder les changements de la course
                                 val updatedCourse = CourseUpdate(
-                                    name = course.name,
-                                    maxDuration = course.maxDuration,
+                                    name = courseName,  // Utilisez courseName ici
+                                    maxDuration = maxDuration.toIntOrNull() ?: course.maxDuration,  // Convertissez maxDuration en Int
                                     position = course.position,
                                     isOver = course.isOver,
                                     competitionId = course.competitionId
@@ -134,5 +138,6 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
         Text("Course introuvable", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
 
 
