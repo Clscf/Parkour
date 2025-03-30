@@ -22,11 +22,16 @@ object RetrofitInstance {
         .addInterceptor(authInterceptor)
         .build()
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+    }
+
+
     private val retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(client)
-            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
     }
 

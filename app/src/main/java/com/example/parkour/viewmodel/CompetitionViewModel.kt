@@ -97,29 +97,22 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
 
     fun updateCompetition(competitionId: Int, updatedCompetition: CompetitionUpdate) {
         viewModelScope.launch {
+            Log.d("CompetitionViewModel", "Envoi de la mise à jour : $updatedCompetition")
+
             try {
                 val response = repository.updateCompetition(competitionId, updatedCompetition)
 
+
                 if (response.isSuccessful) {
-                    _competitions.value = _competitions.value.map {
-                        if (it.id == competitionId) {
-                            it.copy(
-                                name = updatedCompetition.name,
-                                ageMin = updatedCompetition.ageMin,
-                                ageMax = updatedCompetition.ageMax,
-                                gender = updatedCompetition.gender,
-                                status = updatedCompetition.status
-                            )
-                        } else {
-                            it
-                        }
-                    }
                     Log.d("CompetitionViewModel", "Compétition mise à jour avec succès")
+                    loadCompetitions() // <-- Recharge la liste depuis l'API
                 } else {
+                    Log.d("CompetitionViewModel", "Réponse API : ${response.body()}")
                     Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.e("CompetitionViewModel", "Erreur lors de la mise à jour : ${e.message}")
+
+                Log.e("CompetitionViewModel", "Erreurrrrr lors de la mise à jour : ${e.message}")
             }
         }
     }

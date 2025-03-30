@@ -9,6 +9,6 @@ data class CompetitorCreate(
     @SerialName("last_name") val lastName: String,
     val email: String,
     val phone: String,
-    val gender: Char,
+    val gender: String,
     @SerialName("born_at") val bornAt: String
 )

@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class PerformanceObstacleCreate(
     @SerialName("obstacle_id") val obstacleId: Int,
     @SerialName("performance_id") val performanceId: Int,
-    @SerialName("has_fell") val hasFell: Boolean,
-    @SerialName("to_verify") val toVerify: Boolean,
+    @SerialName("has_fell") val hasFell: Int,
+    @SerialName("to_verify") val toVerify: Int,
     val time: Double
 )

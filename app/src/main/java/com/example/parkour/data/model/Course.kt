@@ -11,6 +11,6 @@ data class Course(
     val name: String,
     @SerialName("max_duration") val maxDuration: Int,
     val position: Int,
-    @SerialName("is_over") val isOver: Boolean,
+    @SerialName("is_over") val isOver: Int,
     @SerialName("competition_id") val competitionId: Int
 )
