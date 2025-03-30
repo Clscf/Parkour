@@ -21,8 +21,19 @@ fun ArbitrationView(
     val competitions by viewModel.competitions.collectAsState()
     val competitors by viewModel.competitors.collectAsState()
     val obstacles by viewModel.obstacles.collectAsState()
+
     var elapsedTime by remember { mutableStateOf(0L) }
     var isTimerRunning by remember { mutableStateOf(false) }
+    var lastPausedTime by remember { mutableStateOf(0L) }
+    var isPaused by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isTimerRunning) {
+        if (isTimerRunning) {
+            viewModel.startTimer { time ->
+                elapsedTime = lastPausedTime + time
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -73,23 +84,57 @@ fun ArbitrationView(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            // Start from zero
             Button(onClick = {
+                elapsedTime = 0L
+                lastPausedTime = 0L
+                isPaused = false
                 isTimerRunning = true
-                viewModel.startTimer { time -> elapsedTime = time }
             }) {
                 Text("Démarrer")
             }
+
+            // Pause the timer
             Button(onClick = {
                 isTimerRunning = false
+                isPaused = true
+                lastPausedTime = elapsedTime
+                viewModel.stopTimer()
+            }) {
+                Text("Pause")
+            }
+
+            // Resume the timer
+            Button(
+                onClick = {
+                    if (isPaused) {
+                        isTimerRunning = true
+                        isPaused = false
+                    }
+                },
+                enabled = isPaused
+            ) {
+                Text("Reprendre")
+            }
+
+            // Stop the timer completely
+            Button(onClick = {
+                isTimerRunning = false
+                elapsedTime = 0L
+                lastPausedTime = 0L
+                isPaused = false
                 viewModel.stopTimer()
             }) {
                 Text("Arrêter")
             }
-            Button(onClick = {
-                viewModel.registerPerformance(elapsedTime.toDouble(), hasFell = true)
-            }) {
-                Text("Chute")
-            }
+        }
+
+        // Chute button (kept as in original code)
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = {
+            viewModel.registerPerformance(elapsedTime.toDouble(), hasFell = true)
+        }) {
+            Text("Chute")
         }
 
         // Obstacle suivant
@@ -114,3 +159,4 @@ fun ArbitrationView(
         }
     }
 }
+
