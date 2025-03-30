@@ -13,14 +13,17 @@ import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.data.repository.ArbitrationRepository
 import com.example.parkour.network.RetrofitInstance
 import com.example.parkour.repository.CompetitionRepository
+import com.example.parkour.repository.CompetitorRepository
 import com.example.parkour.ui.view.ArbitrationView
 import com.example.parkour.repository.CourseRepository
 import com.example.parkour.ui.screens.UpdateCourseView
+import com.example.parkour.ui.view.CompetitorView
 import com.example.parkour.ui.view.CreateCompetitionView
 import com.example.parkour.ui.view.CreateCourseView
 import com.example.parkour.ui.view.UpdateCompetitionView
 import com.example.parkour.viewmodel.ArbitrationViewModel
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
+import com.example.parkour.ui.viewmodel.CompetitorViewModel
 import com.example.parkour.viewmodel.CourseViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
@@ -32,6 +35,7 @@ fun AppNavigation() {
     val competitionViewModel = remember { CompetitionViewModel(CompetitionRepository(apiService)) }
     val arbitrationViewModel = remember { ArbitrationViewModel(ArbitrationRepository(apiService)) }
     val courseViewModel = remember { CourseViewModel(CourseRepository(apiService)) }
+    val competitorViewModel = remember { CompetitorViewModel(CompetitorRepository(apiService))  }
 
     NavHost(navController = navController, startDestination = "home") {
         // Page d'accueil
@@ -43,6 +47,14 @@ fun AppNavigation() {
         composable("createCompetition") {
             CreateCompetitionView(competitionViewModel, navController)
         }
+
+        composable("addCompetitorCompetition/{competitionId}", arguments = listOf(
+            navArgument("competitionId") { type = NavType.IntType }
+        )) { backStackEntry ->
+            val competitionId = backStackEntry.arguments?.getInt("competitionId") ?: return@composable
+            CompetitorView(viewModelCompetition = competitionViewModel, viewModelCompetitor = competitorViewModel, navController = navController, competitionId = competitionId)
+        }
+
 
         // Page de mise à jour de compétition
         composable(

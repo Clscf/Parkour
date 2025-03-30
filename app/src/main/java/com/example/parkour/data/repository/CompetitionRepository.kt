@@ -49,8 +49,12 @@ class CompetitionRepository(private val apiService: ApiService) {
         return apiService.getCompetitionCompetitors(id)
     }
 
-    suspend fun addCompetitorToCompetition(competitionId: Int, competitor: CompetitorCreate): Response<Unit> {
+    suspend fun addCompetitorToCompetition(competitionId: Int, competitor: Competitor): Response<Unit> {
         return apiService.addCompetitorToCompetition(competitionId, competitor)
+    }
+
+    suspend fun removeCompetitorFromCompetition(id: Int, competitionId: Int ): Response<Unit>{
+        return apiService.removeCompetitorFromCompetition(id, competitionId)
     }
 
 

@@ -15,6 +15,10 @@ class CompetitorViewModel(private val repository: CompetitorRepository) : ViewMo
     private val _competitors = MutableStateFlow<List<Competitor>>(emptyList())
     val competitors: StateFlow<List<Competitor>> = _competitors
 
+    init {
+        loadCompetitors()
+    }
+
     fun loadCompetitors() {
         viewModelScope.launch {
             try {

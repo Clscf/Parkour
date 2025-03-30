@@ -251,6 +251,46 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                         }
                     }
 
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
+                        competitions.forEach { competition ->
+                            DropdownMenuItem(
+                                text = { Text(competition.name) },
+                                onClick = {
+                                    selectedCompetition = competition
+                                    viewModel.loadCoursesForCompetition(competition.id)
+                                    viewModel.loadCompetitionCompetitors(competition.id)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                    val competitors = viewModel.competitors.collectAsState().value
+
+                    selectedCompetition?.let { competition ->
+                        Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                            Text("Compétiteurs de la compétition :", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(bottom = 8.dp))
+                            Button(onClick = { navController.navigate("addCompetitorCompetition/${competition.id}") }, modifier = Modifier.padding(bottom = 8.dp)) {
+                                Text("Ajouter un compétiteur")
+
+                            }
+
+                            if (competitors.isNotEmpty()) {
+                                LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                                    items(competitors) { competitor ->
+                                        Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                                            Text(competitor.firstName, style = MaterialTheme.typography.bodyMedium)
+                                            Button(onClick = { /* Gérer la suppression si nécessaire */ }) {
+                                                Text("Supprimer")
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                Text("Aucun compétiteur inscrit.", style = MaterialTheme.typography.bodyMedium)
+                            }
+                        }
+                    }
+
                     Spacer(modifier = Modifier.weight(1f))
 
                     Button(

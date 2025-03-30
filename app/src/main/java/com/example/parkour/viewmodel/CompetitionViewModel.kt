@@ -168,7 +168,7 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
         }
     }
 
-    fun addCompetitorToCompetition(competitionId: Int, competitor: CompetitorCreate) {
+    fun addCompetitorToCompetition(competitionId: Int, competitor: Competitor) {
         viewModelScope.launch {
             try {
                 val response = repository.addCompetitorToCompetition(competitionId, competitor)
@@ -183,6 +183,24 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
             }
         }
     }
+
+    fun removeCompetitorFromCompetition(competitorId: Int, competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.removeCompetitorFromCompetition(competitorId, competitionId)
+                if (response.isSuccessful) {
+                    loadCompetitionCompetitors(competitionId)
+                    Log.d("CompetitionViewModel", "Compétiteur supprimé avec succès")
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la suppression du compétiteur : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la suppression du compétiteur : ${e.message}")
+            }
+        }
+    }
+
+
 
 
 
