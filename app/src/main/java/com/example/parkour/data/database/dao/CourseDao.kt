@@ -1,9 +1,9 @@
 package com.example.parkour.data.database.dao
 
-import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+
 import com.example.parkour.data.model.Course
 interface CourseDao {
     @Insert
