@@ -1,9 +1,10 @@
 package com.example.parkour.data.model
 
+import androidx.room.Entity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
+@Serializable @Entity
 data class Performance(
     val id: Int,
     @SerialName("competitor_id") val competitorId: Int,
