@@ -23,6 +23,10 @@ retrofit2KotlinxSerializationConverter = "1.0.0"
 retrofit2KotlinxSerializationConverterVersion = "0.8.0"
 roomCommon = "2.6.1"
 roomKtx = "2.6.1"
+runner = "1.6.2"
+coreKtxVersion = "1.6.1"
+junitKtx = "1.2.1"
+core = "1.48.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -54,6 +58,10 @@ retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit
 retrofit2-kotlinx-serialization-converter-v080 = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverterVersion" }
 androidx-room-common = { group = "androidx.room", name = "room-common", version.ref = "roomCommon" }
 androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomKtx" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+core-ktx = { group = "androidx.test", name = "core-ktx", version.ref = "coreKtxVersion" }
+androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
+core = { group = "com.google.ar", name = "core", version.ref = "core" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

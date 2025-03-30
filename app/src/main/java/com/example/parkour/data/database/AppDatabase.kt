@@ -1,10 +1,10 @@
 package com.example.parkour.data.database
 
+import CourseDao
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.parkour.data.database.dao.CompetitionDao
 import com.example.parkour.data.database.dao.CompetitorDao
-import com.example.parkour.data.database.dao.CourseDao
 import com.example.parkour.data.database.dao.CourseObstacleDao
 import com.example.parkour.data.database.dao.ObstacleDao
 import com.example.parkour.data.database.dao.PerformanceDao

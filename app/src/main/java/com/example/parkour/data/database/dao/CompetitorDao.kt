@@ -1,5 +1,6 @@
 package com.example.parkour.data.database.dao
 
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.parkour.data.model.Competitor
@@ -13,4 +14,7 @@ interface CompetitorDao {
 
     @Query("SELECT * FROM Competitor")
     suspend fun getAllCompetitors(): List<Competitor>
+
+    @Query("DELETE FROM Competitor WHERE id = :competitorId")
+    suspend fun deleteCompetitor(competitorId: Int)
 }

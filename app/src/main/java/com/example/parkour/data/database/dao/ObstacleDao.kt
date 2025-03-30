@@ -8,9 +8,9 @@ interface ObstacleDao {
     @Insert
     suspend fun insertObstacle(obstacle: Obstacle)
 
-    @Query("SELECT * FROM Obstacle")
+    @Query("SELECT id, createdAt, updatedAt, name FROM Obstacle")
     suspend fun getAllObstacles(): List<Obstacle>
 
-    @Query("SELECT * FROM Obstacle WHERE id = :obstacleId")
-    suspend fun getObstacleById(obstacleId: Int)
+    @Query("SELECT id, createdAt, updatedAt, name FROM Obstacle WHERE id = :obstacleId")
+    suspend fun getObstacleById(obstacleId: Int): Obstacle?
 }
