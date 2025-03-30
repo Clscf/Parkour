@@ -42,22 +42,24 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
             try {
                 val response = repository.getCompetitions()
                 if (response.isSuccessful) {
+                    Log.d("CompetitionViewModel", "Réponse brute : ${response.body()?.toString()}")
                     _competitions.value = response.body() ?: emptyList()
                 } else {
-                    Log.e("ArbitrationViewModel", "Erreur API : ${response.code()} - ${response.message()}")
+                    Log.e("CompetitionViewModel", "Erreur : ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("ArbitrationViewModel", "Erreur API : ${e.message}")
+                Log.e("CompetitionViewModel", "Erreur API :", e)
+                _competitions.value = emptyList()  // Si une erreur se produit, vider la liste pour éviter un comportement inattendu.
             }
         }
     }
 
-    // Charger les compétiteurs d'une compétition
-    fun loadCompetitors() {
+
+    // Charger les compétiteurs pour une compétition spécifique
+    fun loadCompetitorsForCompetition(competitionId: Int) {
         viewModelScope.launch {
             try {
-                val response: Response<List<Competitor>> = repository.getCompetitors()
-
+                val response = repository.getCompetitorsForCompetition(competitionId)
                 if (response.isSuccessful) {
                     _competitors.value = response.body() ?: emptyList()
                 } else {
@@ -68,6 +70,8 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
             }
         }
     }
+
+
 
     // Charger les obstacles d'un parcours
     fun loadObstacles(courseId: Int) {
@@ -144,8 +148,8 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
     // Avancer à l'obstacle suivant
     fun moveToNextObstacle() {
         val currentIndex = _obstacles.value.indexOf(_currentObstacle.value)
-        if (currentIndex in _obstacles.value.indices) {
-            _currentObstacle.value = _obstacles.value.getOrNull(currentIndex + 1)
+        if (currentIndex in _obstacles.value.indices && currentIndex < _obstacles.value.size - 1) {
+            _currentObstacle.value = _obstacles.value[currentIndex + 1]
         }
     }
 }

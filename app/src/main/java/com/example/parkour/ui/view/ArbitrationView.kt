@@ -10,8 +10,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.parkour.data.model.Competition
 import com.example.parkour.viewmodel.ArbitrationViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
 fun ArbitrationView(
@@ -26,6 +28,9 @@ fun ArbitrationView(
     var isTimerRunning by remember { mutableStateOf(false) }
     var lastPausedTime by remember { mutableStateOf(0L) }
     var isPaused by remember { mutableStateOf(false) }
+
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCompetition by remember { mutableStateOf<Competition?>(null) }
 
     LaunchedEffect(isTimerRunning) {
         if (isTimerRunning) {
@@ -44,26 +49,60 @@ fun ArbitrationView(
     ) {
         Text(text = "Arbitrage", style = MaterialTheme.typography.headlineMedium)
 
-        // Sélectionner la compétition
+        // Dropdown menu pour sélectionner une compétition
         Text("Sélectionner une compétition")
-        LazyColumn {
-            items(competitions) { competition ->
-                Button(onClick = {
-                    viewModel.loadCompetitors()
-                    viewModel.selectCourse(competition.id)
-                }) {
-                    Text("Compétition: ${competition.name}")
+
+        // Menu déroulant pour la sélection de la compétition
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = it }
+        ) {
+            OutlinedTextField(
+                value = selectedCompetition?.name ?: "Aucune sélection",
+                onValueChange = {},
+                label = { Text("Compétition") },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                if (competitions.isNotEmpty()) {
+                    competitions.forEach { competition ->
+                        DropdownMenuItem(
+                            text = { Text(competition.name) },
+                            onClick = {
+                                // Sélectionne la compétition et charge les compétiteurs associés
+                                selectedCompetition = competition
+                                viewModel.loadCompetitorsForCompetition(competition.id)
+                                expanded = false
+                            }
+                        )
+                    }
+                } else {
+                    // Affichage d'un message si aucune compétition n'est trouvée
+                    DropdownMenuItem(
+                        text = { Text("Aucune compétition disponible") },
+                        enabled = false,
+                        onClick = {}
+                    )
                 }
             }
         }
 
         // Sélectionner un compétiteur
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Sélectionner un compétiteur")
-        LazyColumn {
-            items(competitors) { competitor ->
-                Button(onClick = { viewModel.selectCompetitor(competitor.id) }) {
-                    Text("Compétiteur: ${competitor.firstName}")
+        if (selectedCompetition != null) {  // Afficher la sélection des compétiteurs seulement si une compétition est sélectionnée
+            Text("Sélectionner un compétiteur")
+            LazyColumn {
+                items(competitors) { competitor ->
+                    Button(onClick = { viewModel.selectCompetitor(competitor.id) }) {
+                        Text("Compétiteur: ${competitor.firstName}")
+                    }
                 }
             }
         }
@@ -159,4 +198,5 @@ fun ArbitrationView(
         }
     }
 }
+
 
