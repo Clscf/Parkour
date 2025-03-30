@@ -15,6 +15,7 @@ import com.example.parkour.network.RetrofitInstance
 import com.example.parkour.repository.CompetitionRepository
 import com.example.parkour.ui.view.ArbitrationView
 import com.example.parkour.repository.CourseRepository
+import com.example.parkour.repository.ObstacleRepository
 import com.example.parkour.ui.screens.UpdateCourseView
 import com.example.parkour.ui.view.CreateCompetitionView
 import com.example.parkour.ui.view.CreateCourseView
@@ -22,6 +23,8 @@ import com.example.parkour.ui.view.UpdateCompetitionView
 import com.example.parkour.viewmodel.ArbitrationViewModel
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import com.example.parkour.viewmodel.CourseViewModel
+import com.example.parkour.ui.screens.CreateObstacleView  // Ajout de l'import de CreateObstacleView
+import com.example.parkour.viewmodel.ObstacleViewModel
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -32,17 +35,13 @@ fun AppNavigation() {
     val competitionViewModel = remember { CompetitionViewModel(CompetitionRepository(apiService)) }
     val arbitrationViewModel = remember { ArbitrationViewModel(ArbitrationRepository(apiService)) }
     val courseViewModel = remember { CourseViewModel(CourseRepository(apiService)) }
+    val obstacleViewModel = remember { ObstacleViewModel(ObstacleRepository(apiService)) }
 
     NavHost(navController = navController, startDestination = "home") {
         // Page d'accueil
         composable("home") {
-            HomeView(competitionViewModel, courseViewModel,navController)
+            HomeView(competitionViewModel, courseViewModel, navController)
         }
-        // Page d'accueil avec le nom de la compétition passée en paramètre
-        /*composable("home/{competitionName}") { backStackEntry ->
-            val competitionName = backStackEntry.arguments?.getString("competitionName") ?: ""
-            HomeView(competitionViewModel, courseViewModel, navController, competitionName)
-        }*/
 
         // Page de création de compétition
         composable("createCompetition") {
@@ -105,7 +104,16 @@ fun AppNavigation() {
             arguments = listOf(navArgument("courseId") { type = NavType.IntType })
         ) { backStackEntry ->
             val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
-            UpdateCourseView(courseId = courseId, viewModel = courseViewModel, navController = navController)
+            UpdateCourseView(courseId = courseId, courseViewModel = courseViewModel, obstacleViewModel = obstacleViewModel, navController = navController)
+        }
+
+        // Page de création de l'obstacle
+        composable(
+            "create_obstacle_view/{courseId}",
+            arguments = listOf(navArgument("courseId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
+            CreateObstacleView(courseId = courseId, viewModel = courseViewModel, viewModel2 = obstacleViewModel, navController = navController)
         }
     }
 }
