@@ -3,6 +3,7 @@ package com.example.parkour.repository
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.CourseObstacle
 import com.example.parkour.data.model.Obstacle
+import com.example.parkour.data.model.ObstacleIdRequest
 import com.example.parkour.data.model.create.CourseCreate
 import com.example.parkour.data.model.uptdate.CourseUpdate
 import com.example.parkour.network.ApiService
@@ -31,8 +32,8 @@ class CourseRepository(private val apiService: ApiService) {
     }
 
     // Ajoute un obstacle à une course
-    suspend fun addObstacleToCourse(courseId: Int, obstacleId: Int): Response<Unit> {
-        return apiService.addObstacleToCourse(courseId, obstacleId)
+    suspend fun addObstacleToCourse(courseId: Int, obstacle: ObstacleIdRequest): Response<Unit> {
+        return apiService.addObstacleToCourse(courseId, obstacle)
     }
 
     // Supprime un obstacle d'une course

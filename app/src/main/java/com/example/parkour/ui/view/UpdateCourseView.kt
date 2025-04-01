@@ -9,9 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.parkour.data.model.Obstacle
 import com.example.parkour.data.model.uptdate.CourseUpdate
+import com.example.parkour.ui.items.CourseObstacleItem
 import com.example.parkour.viewmodel.CourseViewModel
 import com.example.parkour.viewmodel.ObstacleViewModel
+import com.example.parkour.ui.items.ObstacleItem  // Importer l'ObstacleItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -19,6 +22,7 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
     val courses = courseViewModel.courses.collectAsState().value
     val course = courses.find { it.id == courseId }
     val obstacles = obstacleViewModel.obstacles.collectAsState().value
+    val obstacleassocie = courseViewModel.courseObstacles.collectAsState().value
 
     // Définir les variables d'état pour le nom et la durée de la course
     var courseName by remember { mutableStateOf(course?.name ?: "") }
@@ -66,41 +70,51 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Affichage des obstacles associés à la course
-                    Text("Obstacles associés :", style = MaterialTheme.typography.bodyLarge)
+                    Text("Obstacles Associés :", style = MaterialTheme.typography.bodyLarge)
 
                     // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 300.dp) // Limite de hauteur
+                            .heightIn(max = 200.dp) // Limite de hauteur
                     ) {
-                        items(obstacles) { obstacle ->
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(text = obstacle.name, style = MaterialTheme.typography.bodyMedium)
-                                Button(
-                                    onClick = {
-                                        courseViewModel.addObstacleToCourse(courseId, obstacle.id)
-                                    },
-                                    modifier = Modifier.align(Alignment.CenterVertically)
-                                ) {
-                                    Text("+")
+                        items(obstacleassocie) { obstacle ->
+                            CourseObstacleItem(
+                                obstacle = obstacle,
+                                onDelete = {
+                                    // Logique pour supprimer l'obstacle de la course
+                                    courseViewModel.removeObstacleFromCourse(courseId, obstacle.id)
                                 }
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            )
                         }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Bouton pour naviguer vers la page de création d'obstacle
-                    Button(
-                        onClick = {
-                            navController.navigate("create_obstacle_view/$courseId")
+                    // Affichage des obstacles disponibles
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text("Obstacles Disponibles :", style = MaterialTheme.typography.bodyLarge)
+                        Button(onClick = { navController.navigate("create_obstacle_view/$courseId") }) {
+                            Text("+")
                         }
-                    ) {
-                        Text("Ajouter un nouvel obstacle")
                     }
+
+                    // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 200.dp) // Limite de hauteur
+                    ) {
+                        items(obstacles) { obstacle ->
+                            ObstacleItem(
+                                obstacle = obstacle,
+                                onAdd = {
+                                    courseViewModel.addObstacleToCourse(courseId, obstacle)
+                                })
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
 
                     Spacer(modifier = Modifier.height(16.dp))
 
@@ -138,6 +152,3 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
         Text("Course introuvable", style = MaterialTheme.typography.bodyLarge)
     }
 }
-
-
-

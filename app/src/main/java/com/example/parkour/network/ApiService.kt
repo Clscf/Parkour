@@ -85,7 +85,7 @@ interface ApiService {
     suspend fun getCoursePerformances(@Path("id") id: Int): Response<List<Performance>>
 
     @POST("/api/courses/{id}/add_obstacle")
-    suspend fun addObstacleToCourse(@Path("id") id: Int, @Body obstacle: Int): Response<Unit>
+    suspend fun addObstacleToCourse(@Path("id") id: Int, @Body request: ObstacleIdRequest): Response<Unit>
 
     @DELETE("/api/courses/{id}/remove_obstacle/{id_obstacle}")
     suspend fun removeObstacleFromCourse(@Path("id") id: Int, @Path("id_obstacle") obstacleId: Int): Response<Unit>

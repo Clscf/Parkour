@@ -5,13 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -29,6 +35,7 @@ import com.example.parkour.ui.items.CompetitorItem
 import com.example.parkour.ui.items.CourseItem
 import com.example.parkour.viewmodel.CourseViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, navController: NavController, competitionId: Int) {
     LaunchedEffect(competitionId) {
@@ -42,7 +49,17 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
     val competitors = viewModel.competitors.collectAsState().value
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text( "Gestion de la compétition " + competition?.name ) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Retour")
+                    }
+                }
+            )
+        },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -52,11 +69,6 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Gestion de la compétition: ${competition?.name ?: "Inconnue"}",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
 
             // 📌 Affichage des courses
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

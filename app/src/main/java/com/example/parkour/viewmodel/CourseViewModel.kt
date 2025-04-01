@@ -4,7 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parkour.data.model.Course
+import com.example.parkour.data.model.CourseObstacle
 import com.example.parkour.data.model.Obstacle
+import com.example.parkour.data.model.ObstacleIdRequest
 import com.example.parkour.data.model.uptdate.CourseUpdate
 import com.example.parkour.repository.CourseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,8 +17,8 @@ class CourseViewModel(private val repository: CourseRepository) : ViewModel() {
     private val _courses = MutableStateFlow<List<Course>>(emptyList())
     val courses: StateFlow<List<Course>> = _courses
     // Liste des obstacles associés à une course
-    private val _courseObstacles = MutableStateFlow<List<Obstacle>>(emptyList())
-    val courseObstacles: StateFlow<List<Obstacle>> = _courseObstacles
+    private val _courseObstacles = MutableStateFlow<List<CourseObstacle>>(emptyList())
+    val courseObstacles: StateFlow<List<CourseObstacle>> = _courseObstacles
 
 
     init {
@@ -80,10 +82,10 @@ class CourseViewModel(private val repository: CourseRepository) : ViewModel() {
         }
     }
 
-    fun addObstacleToCourse(courseId: Int, obstacleId: Int) {
+    fun addObstacleToCourse(courseId: Int, obstacle: Obstacle) {
         viewModelScope.launch {
             try {
-                val response = repository.addObstacleToCourse(courseId, obstacleId)
+                val response = repository.addObstacleToCourse(courseId, ObstacleIdRequest(obstacle.id))
                 if (response.isSuccessful) {
                     // Recharger les obstacles pour la course après l'ajout
                     loadObstaclesForCourse(courseId)
@@ -126,7 +128,7 @@ class CourseViewModel(private val repository: CourseRepository) : ViewModel() {
                     val obstacleIds = courseObstacles.map { it.id }
 
                     // Étape 3: Charger tous les obstacles existants
-                    val obstaclesResponse = repository.getObstacles()
+                    val obstaclesResponse = repository.getCourseObstacles(courseId)
                     if (obstaclesResponse.isSuccessful) {
                         val allObstacles = obstaclesResponse.body() ?: emptyList()
 

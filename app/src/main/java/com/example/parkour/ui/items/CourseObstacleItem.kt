@@ -11,10 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.parkour.data.model.Course
+import com.example.parkour.data.model.CourseObstacle
 
 @Composable
-fun CourseItem(course: Course, onEdit: () -> Unit, onDelete: () -> Unit) {
+fun CourseObstacleItem(obstacle: CourseObstacle, onDelete: () -> Unit) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -30,21 +30,9 @@ fun CourseItem(course: Course, onEdit: () -> Unit, onDelete: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Nom : ${course.name}", style = MaterialTheme.typography.titleMedium)
-                if (course.maxDuration>3600){
-                    Text(text = "Durée max : ${course.maxDuration/3600} h ${course.maxDuration%3600%60} min ${course.maxDuration%60} sec", style = MaterialTheme.typography.bodyMedium)
-                }
-                else if (course.maxDuration>60){
-                    Text(text = "Durée max : ${course.maxDuration/60} min ${course.maxDuration%60} sec", style = MaterialTheme.typography.bodyMedium)
-                }
-                else{
-                    Text(text = "Durée max : ${course.maxDuration} sec", style = MaterialTheme.typography.bodyMedium)
-                }
+                Text(text = "Nom : ${obstacle.obstacleName}", style = MaterialTheme.typography.titleMedium)
             }
             Row {
-                IconButton(onClick = onEdit) {
-                    Icon(imageVector = Icons.Default.Edit, contentDescription = "Modifier", tint = Color.Blue)
-                }
                 IconButton(onClick = onDelete) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
                 }
