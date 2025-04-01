@@ -1,7 +1,9 @@
 package com.example.parkour.ui.screen
 
+import DetailCompetitionView
 import android.annotation.SuppressLint
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -10,7 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.parkour.HomeView
+import com.example.parkour.ui.view.HomeView
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.data.repository.ArbitrationRepository
 import com.example.parkour.network.RetrofitInstance
@@ -48,7 +50,7 @@ fun AppNavigation() {
     NavHost(navController = navController, startDestination = "home") {
         // Page d'accueil
         composable("home") {
-            HomeView(competitionViewModel, courseViewModel,navController)
+            HomeView(competitionViewModel,navController)
         }
 
         // Page de création de compétition
@@ -124,6 +126,30 @@ fun AppNavigation() {
         ) { backStackEntry ->
             val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
             CreateObstacleView(courseId = courseId, viewModel = courseViewModel, viewModel2 = obstacleViewModel, navController = navController)
+        }
+
+        // Page d'édition de la compétition
+        composable(
+            "competitionEditor/{competitionId}",
+            arguments = listOf(navArgument("competitionId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val competitionId = backStackEntry.arguments?.getInt("competitionId") ?: return@composable
+            //UpdateCompetitionView(competitionViewModel, navController, competitionId)
+        }
+
+        // Détails de la compétition
+        composable(
+            "competitionDetails/{competitionId}",
+            arguments = listOf(navArgument("competitionId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val competitionId = backStackEntry.arguments?.getInt("competitionId")
+            Log.d("Navigation", "competitionId reçu: $competitionId")
+
+            if (competitionId != null) {
+                DetailCompetitionView(competitionViewModel, competitionId, navController)
+            } else {
+                Log.e("Navigation", "Erreur: competitionId est null")
+            }
         }
 
 

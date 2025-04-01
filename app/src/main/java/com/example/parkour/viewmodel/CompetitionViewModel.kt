@@ -39,6 +39,9 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     private val _competitionDeleted = MutableStateFlow(false)
     val competitionDeleted: StateFlow<Boolean> = _competitionDeleted
 
+    private val _selectedCompetition = MutableStateFlow<Competition?>(null)
+    val selectedCompetition: StateFlow<Competition?> = _selectedCompetition
+
     init {
         loadCompetitions()
         //loadCourses()
@@ -222,6 +225,22 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     fun getCompetitorsForCompetition(competitionId: Int): Flow<List<Competitor>> {
         return _competitors.map { competitors ->
             competitors.filter { competitor -> competitor.id == competitionId }
+        }
+    }
+
+    fun getCompetitionById(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCompetition(id)
+                if (response.isSuccessful) {
+                    _selectedCompetition.value = response.body()
+                } else {
+                    // Gérer les erreurs ici
+                    println("Erreur: ${response.message()}")
+                }
+            } catch (e: Exception) {
+                println("Exception: ${e.message}")
+            }
         }
     }
 
