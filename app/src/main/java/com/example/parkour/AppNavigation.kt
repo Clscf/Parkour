@@ -147,7 +147,7 @@ fun AppNavigation() {
             Log.d("Navigation", "competitionId reçu: $competitionId")
 
             if (competitionId != null) {
-                DetailCompetitionView(competitionViewModel, competitionId, navController)
+                DetailCompetitionView(competitionViewModel, courseViewModel, competitionId, navController)
             } else {
                 Log.e("Navigation", "Erreur: competitionId est null")
             }

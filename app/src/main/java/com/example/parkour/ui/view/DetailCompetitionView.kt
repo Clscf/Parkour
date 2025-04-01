@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,10 +14,13 @@ import androidx.navigation.NavController
 import com.example.parkour.ui.items.CardTitleItem
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import com.example.parkour.ui.view.SimpleBottomNavigation
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import com.example.parkour.viewmodel.CourseViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailCompetitionView(viewModel: CompetitionViewModel, competitionId: Int, navController: NavController) {
+fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, competitionId: Int, navController: NavController) {
     val competition by viewModel.selectedCompetition.collectAsState()
     val courses by viewModel.courses.collectAsState()
     val obstacles by viewModel.obstacles.collectAsState()
@@ -66,23 +70,63 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, competitionId: Int, n
                         if (courses.isEmpty()) {
                             Text("Aucune course disponible.", style = MaterialTheme.typography.bodyMedium)
                         } else {
-                            LazyColumn { items(courses) { Text("- ${it.name}") } }
+
+                            var expandedCourseId by remember { mutableStateOf<Int?>(null) }
+                            val courseObstacles by courseViewModel.courseObstacles.collectAsState()
+
+                            LazyColumn {
+                                items(courses) { course ->
+                                    Column {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text("- ${course.name}", modifier = Modifier.weight(1f))
+
+                                            IconButton(onClick = {
+                                                if (expandedCourseId == course.id) {
+                                                    expandedCourseId = null
+                                                } else {
+                                                    expandedCourseId = course.id
+                                                    courseViewModel.loadObstaclesForCourse(course.id) // 🔥 Charge les obstacles
+                                                }
+                                            }) {
+                                                Icon(
+                                                    imageVector = if (expandedCourseId == course.id)
+                                                        Icons.Default.KeyboardArrowUp else Icons.Default.ArrowDropDown,
+                                                    contentDescription = "Voir obstacles"
+                                                )
+                                            }
+                                        }
+
+                                        if (expandedCourseId == course.id) {
+                                            if (courseObstacles.isNotEmpty()) {
+                                                Column(modifier = Modifier.padding(start = 16.dp)) {
+                                                    courseObstacles.forEach { obstacle ->
+                                                        Text("- ${obstacle.obstacleName}", style = MaterialTheme.typography.bodyMedium)
+                                                    }
+                                                }
+                                            } else {
+                                                Text("Aucun obstacle associé.", modifier = Modifier.padding(start = 16.dp))
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
                         }
                     }
 
-                    CardTitleItem("Obstacles") {
-                        if (obstacles.isEmpty()) {
-                            Text("Aucun obstacle enregistré.", style = MaterialTheme.typography.bodyMedium)
-                        } else {
-                            LazyColumn { items(obstacles) { Text("- ${it.name}") } }
-                        }
-                    }
+
 
                     CardTitleItem("Compétiteurs") {
                         if (competitors.isEmpty()) {
                             Text("Aucun compétiteur inscrit.", style = MaterialTheme.typography.bodyMedium)
                         } else {
-                            LazyColumn { items(competitors) { Text("- ${it.firstName} ${it.lastName}") } }
+                            LazyColumn(Modifier.height(140.dp)) { items(competitors) { Text("- ${it.firstName} ${it.lastName}") } }
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { navController.navigate("addCompetitorCompetition/${competitionId}") }) {

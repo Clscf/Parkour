@@ -82,8 +82,13 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                             CourseObstacleItem(
                                 obstacle = obstacle,
                                 onDelete = {
-                                    // Logique pour supprimer l'obstacle de la course
-                                    courseViewModel.removeObstacleFromCourse(courseId, obstacle.id)
+                                    val obstacleId = obstacles.find { it.name == obstacle.obstacleName }?.id
+                                    if (obstacleId != null) {
+                                        courseViewModel.removeObstacleFromCourse(
+                                            courseId,
+                                            obstacleId
+                                        )
+                                    }
                                 }
                             )
                         }
@@ -99,21 +104,28 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                         }
                     }
 
+                    val obstaclesDisponibles = obstacles.filter { obstacleDispo ->
+                        obstacleassocie.none { it.obstacleName == obstacleDispo.name }
+                    }
+
+
                     // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 200.dp) // Limite de hauteur
+                            .heightIn(max = 200.dp)
                     ) {
-                        items(obstacles) { obstacle ->
+                        items(obstaclesDisponibles) { obstacle ->
                             ObstacleItem(
                                 obstacle = obstacle,
                                 onAdd = {
                                     courseViewModel.addObstacleToCourse(courseId, obstacle)
-                                })
+                                }
+                            )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
+
 
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -141,7 +153,7 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                                 navController.popBackStack()
                             }
                         ) {
-                            Text("Sauvegarder")
+                            Text("Retour")
                         }
                     }
                 }

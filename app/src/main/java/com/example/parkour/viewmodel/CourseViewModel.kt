@@ -103,52 +103,44 @@ class CourseViewModel(private val repository: CourseRepository) : ViewModel() {
     fun removeObstacleFromCourse(courseId: Int, obstacleId: Int) {
         viewModelScope.launch {
             try {
+                Log.d("CourseViewModel", "Tentative de suppression de l'obstacle $obstacleId de la course $courseId")
                 val response = repository.removeObstacleFromCourse(courseId, obstacleId)
+
                 if (response.isSuccessful) {
-                    // Recharger les obstacles après suppression
+                    Log.d("CourseViewModel", "Obstacle supprimé avec succès")
                     loadObstaclesForCourse(courseId)
                 } else {
-                    Log.e("CourseViewModel", "Erreur lors de la suppression de l'obstacle")
+                    Log.e("CourseViewModel", "Erreur lors de la suppression : ${response.code()} - ${response.message()}")
+                    Log.e("CourseViewModel", "Body de la réponse : ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
-                Log.e("CourseViewModel", "Exception lors de la suppression de l'obstacle : ${e.message}")
+                Log.e("CourseViewModel", "Exception lors de la suppression : ${e.message}")
             }
         }
     }
+
 
     fun loadObstaclesForCourse(courseId: Int) {
         viewModelScope.launch {
             try {
                 // Étape 1: Charger les obstacles associés à la course
-                val courseObstaclesResponse = repository.getCourseObstacles(courseId)
-                if (courseObstaclesResponse.isSuccessful) {
-                    val courseObstacles = courseObstaclesResponse.body() ?: emptyList()
+                val response = repository.getCourseObstacles(courseId)
+                if (response.isSuccessful) {
+                    val courseObstacles = response.body() ?: emptyList()
 
-                    // Étape 2: Extraire les IDs des obstacles associés à la course
-                    val obstacleIds = courseObstacles.map { it.id }
+                    // Log pour debug
+                    Log.d("CourseViewModel", "Obstacles récupérés pour la course $courseId : $courseObstacles")
 
-                    // Étape 3: Charger tous les obstacles existants
-                    val obstaclesResponse = repository.getCourseObstacles(courseId)
-                    if (obstaclesResponse.isSuccessful) {
-                        val allObstacles = obstaclesResponse.body() ?: emptyList()
-
-                        // Étape 4: Filtrer les obstacles pour ne garder que ceux qui sont associés à la course
-                        val obstaclesForCourse = allObstacles.filter { obstacle ->
-                            obstacle.id in obstacleIds
-                        }
-
-                        // Étape 5: Mettre à jour l'état avec les obstacles associés à la course
-                        _courseObstacles.value = obstaclesForCourse
-                    } else {
-                        Log.e("CourseViewModel", "Erreur lors du chargement des obstacles existants")
-                    }
+                    // Mettre à jour l'état avec les obstacles récupérés
+                    _courseObstacles.value = courseObstacles
                 } else {
-                    Log.e("CourseViewModel", "Erreur lors du chargement des obstacles associés à la course")
+                    Log.e("CourseViewModel", "Erreur lors du chargement des obstacles de la course : ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
                 Log.e("CourseViewModel", "Exception lors du chargement des obstacles : ${e.message}")
             }
         }
     }
+
 
 }
