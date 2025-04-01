@@ -9,11 +9,11 @@ import com.example.parkour.data.model.SyncEntity
 @Dao
 interface SyncDao {
     @Insert
-    suspend fun insertSyncEntity(syncEntity: SyncEntity)
+    fun insertSyncEntity(syncEntity: SyncEntity)
 
-    @Query ("SELECT * FROM SyncEntity")
-    suspend fun getAllSyncActions(): List<SyncEntity>
+    @Query("SELECT * FROM syncentity")
+    fun getAllSyncActions(): List<SyncEntity>
 
     @Delete
-    suspend fun deleteSyncEntity(syncEntity: SyncEntity)
+    fun deleteSyncEntity(syncEntity: SyncEntity)
 }

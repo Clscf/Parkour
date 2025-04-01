@@ -1,12 +1,14 @@
 package com.example.parkour.data.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable @Entity
+@Serializable
+@Entity
 data class PerformanceObstacle(
-    val id: Int,
+    @PrimaryKey val id: Int,
     @SerialName("obstacle_id") val obstacleId: Int,
     @SerialName("performance_id") val performanceId: Int,
     @SerialName("has_fell") val hasFell: Int,

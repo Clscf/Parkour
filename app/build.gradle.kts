@@ -4,7 +4,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0" // essayer une version antérieure
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -44,7 +45,6 @@ android {
         jvmTarget = "11"
         freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
-
 }
 
 dependencies {
@@ -73,6 +73,8 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
     implementation(libs.core)
     implementation(libs.androidx.media3.common.ktx)
+
+    kapt("androidx.room:room-compiler:2.5.2")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0") // API JUnit Jupiter

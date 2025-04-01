@@ -1,12 +1,14 @@
 package com.example.parkour.data.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable @Entity
+@Serializable
+@Entity
 data class Performance(
-    val id: Int,
+    @PrimaryKey val id: Int,
     @SerialName("competitor_id") val competitorId: Int,
     @SerialName("course_id") val courseId: Int,
     val status: String,

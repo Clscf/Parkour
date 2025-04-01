@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable @Entity
+@Serializable
+@Entity
 data class SyncEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val entityType: String,

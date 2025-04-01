@@ -1,25 +1,19 @@
 package com.example.parkour.data.model
 
 import androidx.room.Entity
+import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-
-@Serializable @Entity
+@Entity(tableName = "Competition")
 data class Competition(
-    val id: Int,
-    @SerialName("created_at") val createdAt: String,
-    @SerialName("updated_at") val updatedAt: String,
+    @PrimaryKey val id: Int,
     val name: String,
-    @SerialName("age_min") val ageMin: Int,
-    @SerialName("age_max") val ageMax: Int,
+    val createdAt: String,
+    val updatedAt: String,
+    val ageMin: Int,
+    val ageMax: Int,
     val gender: String,
-    @SerialName("has_retry") val hasRetry: Int,
+    val hasRetry: Int,
     val status: String
-
 )
-
-
-
-
-

@@ -10,9 +10,8 @@ import com.example.parkour.data.model.Performance
 @Dao
 interface PerformanceDao {
     @Insert
-    suspend fun insertPerformance(performance: Performance)
+    fun insertPerformance(performance: Performance)
 
     @Query("SELECT * FROM Performance WHERE courseId = :courseId")
-    suspend fun getPerformanceByCourse(courseId: Int): List<Performance>
-
+    fun getPerformanceByCourse(courseId: Int): List<Performance>
 }

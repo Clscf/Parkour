@@ -1,22 +1,22 @@
+package com.example.parkour.data.database.dao
+
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.example.parkour.data.model.Course
 
+@Dao
 interface CourseDao {
     @Insert
-    suspend fun insertCourse(course: Course)
-
-    // Correct reference: Use column names defined with @SerialName
-    @Query("SELECT * FROM Course WHERE competitionId = :competitionId")
-    suspend fun getCoursesByCompetition(competitionId: Int): List<Course>
+    fun insertCourse(course: Course)
 
     @Update
-    suspend fun updateCourse(course: Course)
+    fun updateCourse(course: Course)
 
     @Query("DELETE FROM Course WHERE id = :courseId")
-    suspend fun deleteCourse(courseId: Int)
+    fun deleteCourse(courseId: Int)
 
     @Query("SELECT * FROM Course WHERE id = :courseId")
-    suspend fun getCourseById(courseId: Int): Course?
+    fun getCourseById(courseId: Int): Course?
 }

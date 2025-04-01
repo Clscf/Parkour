@@ -1,27 +1,14 @@
 package com.example.parkour.data.database
 
-import CourseDao
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.example.parkour.data.database.dao.CompetitionDao
-import com.example.parkour.data.database.dao.CompetitorDao
-import com.example.parkour.data.database.dao.CourseObstacleDao
-import com.example.parkour.data.database.dao.ObstacleDao
-import com.example.parkour.data.database.dao.PerformanceDao
-import com.example.parkour.data.database.dao.PerformanceObstacleDao
-import com.example.parkour.data.database.dao.SyncDao
-import com.example.parkour.data.model.Competition
-import com.example.parkour.data.model.Competitor
-import com.example.parkour.data.model.Performance
-import com.example.parkour.data.model.Course
-import com.example.parkour.data.model.CourseObstacle
-import com.example.parkour.data.model.Obstacle
-import com.example.parkour.data.model.PerformanceObstacle
-import com.example.parkour.data.model.SyncEntity
+import com.example.parkour.data.database.dao.*
+import com.example.parkour.data.model.*
 
 @Database(
     entities = [Competition::class, Performance::class, Course::class, Obstacle::class, Competitor::class, PerformanceObstacle::class, CourseObstacle::class, SyncEntity::class],
-    version = 1
+    version = 1,
+    exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun competitionDao(): CompetitionDao

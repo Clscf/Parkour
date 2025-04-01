@@ -8,11 +8,12 @@ import com.example.parkour.data.model.Competition
 @Dao
 interface CompetitionDao {
     @Insert
-    suspend fun insertCompetition(competition: Competition)
+    fun insertCompetition(competition: Competition)
 
     @Query("SELECT * FROM Competition WHERE id = :competitionId")
-    suspend fun getCompetitionById(competitionId: Int): Competition?
+    fun getCompetitionById(competitionId: Int): Competition?
 
-    @Query("SELECT id, createdAt, updatedAt, name, ageMin, ageMax, gender, hasTry, status FROM Competition")
-    suspend fun getAllCompetitions(): List<Competition>
+    @Query("SELECT * FROM Competition")
+    fun getAllCompetitions(): List<Competition>
+
 }
