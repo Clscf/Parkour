@@ -5,15 +5,16 @@ import androidx.room.PrimaryKey
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Entity(tableName = "Competition")
+@Serializable @Entity
 data class Competition(
     @PrimaryKey val id: Int,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String,
     val name: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val ageMin: Int,
-    val ageMax: Int,
+    @SerialName("age_min") val ageMin: Int,
+    @SerialName("age_max") val ageMax: Int,
     val gender: String,
-    val hasRetry: Int,
+    @SerialName("has_retry") val hasRetry: Int,
     val status: String
+
 )
