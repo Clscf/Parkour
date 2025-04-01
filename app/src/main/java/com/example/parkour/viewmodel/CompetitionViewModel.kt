@@ -222,11 +222,7 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
         }
     }
 
-    fun getCompetitorsForCompetition(competitionId: Int): Flow<List<Competitor>> {
-        return _competitors.map { competitors ->
-            competitors.filter { competitor -> competitor.id == competitionId }
-        }
-    }
+
 
     fun getCompetitionById(id: Int) {
         viewModelScope.launch {
