@@ -1,6 +1,7 @@
 package com.example.parkour.ui.view
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,11 +32,12 @@ fun CompetitorView(
     val competitors = viewModelCompetitor.competitors.collectAsState().value
     val competition = viewModelCompetition.competitions.collectAsState().value
         .find { it.id == competitionId }
-    val alreadyAddedCompetitors = viewModelCompetition.getCompetitorsForCompetition(competitionId)
-        .collectAsState(initial = emptyList()).value
+    val alreadyAddedCompetitors by  viewModelCompetition.competitors.collectAsState()
+
 
     val alreadyAddedIds = alreadyAddedCompetitors.map { it.id }.toSet()
 
+    // Filtrer les compétiteurs en fonction de l'âge, du genre et de la présence dans la compétition
     val filteredCompetitors = competitors.filter { competitor ->
         val birthDate = runCatching { LocalDate.parse(competitor.bornAt) }.getOrNull()
         val isAgeValid = birthDate?.let {
@@ -46,7 +48,11 @@ fun CompetitorView(
         val isGenderValid = competition?.gender == null || competitor.gender == competition.gender
         val isAlreadyAdded = competitor.id in alreadyAddedIds
 
-        isAgeValid && isGenderValid && !isAlreadyAdded
+        isAgeValid && isGenderValid && !isAlreadyAdded // Ne pas afficher ceux qui sont déjà ajoutés
+    }
+
+    LaunchedEffect(alreadyAddedCompetitors) {
+        Log.d("CompetitorView", "Compétiteurs déjà ajoutés: $alreadyAddedCompetitors")
     }
 
     var selectedCompetitors by remember { mutableStateOf(setOf<Competitor>()) }
@@ -68,13 +74,13 @@ fun CompetitorView(
                     selectedCompetitors.forEach { competitor ->
                         viewModelCompetition.addCompetitorToCompetition(competitionId, competitor)
                     }
-                    selectedCompetitors = emptySet() // Réinitialiser la sélection
-                    navController.popBackStack() // Retour à l'écran précédent après ajout
+                    selectedCompetitors = emptySet()
+                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                enabled = selectedCompetitors.isNotEmpty() // Le bouton est actif si au moins un compétiteur est sélectionné
+                enabled = selectedCompetitors.isNotEmpty()
             ) {
                 Text("Ajouter ${selectedCompetitors.size} compétiteur(s)")
             }
@@ -100,9 +106,9 @@ fun CompetitorView(
                             isSelected = isSelected,
                             onSelectionChange = { isChecked ->
                                 selectedCompetitors = if (isChecked) {
-                                    selectedCompetitors + competitor // Ajouter à la sélection
+                                    selectedCompetitors + competitor
                                 } else {
-                                    selectedCompetitors - competitor // Retirer de la sélection
+                                    selectedCompetitors - competitor
                                 }
                             },
                             onDelete = {}, // Pas besoin de suppression ici
@@ -114,5 +120,6 @@ fun CompetitorView(
         }
     }
 }
+
 
 
