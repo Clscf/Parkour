@@ -9,6 +9,7 @@ import com.example.parkour.data.database.dao.CourseObstacleDao
 import com.example.parkour.data.database.dao.ObstacleDao
 import com.example.parkour.data.database.dao.PerformanceDao
 import com.example.parkour.data.database.dao.PerformanceObstacleDao
+import com.example.parkour.data.database.dao.SyncDao
 import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.Competitor
 import com.example.parkour.data.model.Performance
@@ -16,9 +17,10 @@ import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.CourseObstacle
 import com.example.parkour.data.model.Obstacle
 import com.example.parkour.data.model.PerformanceObstacle
+import com.example.parkour.data.model.SyncEntity
 
 @Database(
-    entities = [Competition::class, Performance::class, Course::class, Obstacle::class, Competitor::class, PerformanceObstacle::class, CourseObstacle::class],
+    entities = [Competition::class, Performance::class, Course::class, Obstacle::class, Competitor::class, PerformanceObstacle::class, CourseObstacle::class, SyncEntity::class],
     version = 1
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -29,4 +31,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun competitorDao(): CompetitorDao
     abstract fun performanceObstacleDao(): PerformanceObstacleDao
     abstract fun courseObstacleDao(): CourseObstacleDao
+    abstract fun syncDao(): SyncDao
 }
