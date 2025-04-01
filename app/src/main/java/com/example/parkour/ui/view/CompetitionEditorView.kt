@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import com.example.parkour.data.model.Competition
+import com.example.parkour.ui.items.CompetitorItem
 import com.example.parkour.ui.items.CourseItem
 import com.example.parkour.viewmodel.CourseViewModel
 
@@ -32,9 +33,11 @@ import com.example.parkour.viewmodel.CourseViewModel
 fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, navController: NavController, competitionId: Int) {
     LaunchedEffect(competitionId) {
         viewModel.getCompetitionById(competitionId)
+        viewModel.loadCoursesForCompetition(competitionId)
+        viewModel.loadCompetitionCompetitors(competitionId)
     }
-    val competition by viewModel.selectedCompetition.collectAsState()
 
+    val competition by viewModel.selectedCompetition.collectAsState()
     val courses = viewModel.courses.collectAsState().value
     val competitors = viewModel.competitors.collectAsState().value
 
@@ -55,6 +58,7 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            // 📌 Affichage des courses
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Courses associées :", style = MaterialTheme.typography.bodyLarge)
                 Button(onClick = { navController.navigate("createCourse/$competitionId") }) {
@@ -68,7 +72,10 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                         CourseItem(
                             course = course,
                             onEdit = { navController.navigate("updateCourse/${course.id}") },
-                            onDelete = { courseViewModel.deleteCourse(course.id) }
+                            onDelete = {
+                                courseViewModel.deleteCourse(course.id)
+                                viewModel.loadCoursesForCompetition(competitionId) // 🔄 Actualisation après suppression
+                            }
                         )
                     }
                 }
@@ -76,20 +83,27 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 Text("Aucune course associée.", style = MaterialTheme.typography.bodyMedium)
             }
 
+            // 📌 Affichage des compétiteurs
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Compétiteurs de la compétition :", style = MaterialTheme.typography.bodyLarge)
             Button(onClick = { navController.navigate("addCompetitorCompetition/$competitionId") }) {
-                Text("Ajouter un compétiteur")
+                Text("+")
             }
+                }
 
             if (competitors.isNotEmpty()) {
                 LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
                     items(competitors) { competitor ->
-                        Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(competitor.firstName, style = MaterialTheme.typography.bodyMedium)
-                            Button(onClick = { viewModel.removeCompetitorFromCompetition(competitionId, competitor.id) }) {
-                                Text("Supprimer")
-                            }
-                        }
+                        CompetitorItem(
+                            competitor = competitor,
+                            isSelected = false,
+                            onSelectionChange = {},
+                            onDelete = {
+                                viewModel.removeCompetitorFromCompetition(competitionId, competitor.id)
+                                viewModel.loadCompetitionCompetitors(competitionId) // 🔄 Actualisation après suppression
+                            },
+                            isAlreadyAdded = true // Les compétiteurs affichés sont déjà ajoutés
+                        )
                     }
                 }
             } else {

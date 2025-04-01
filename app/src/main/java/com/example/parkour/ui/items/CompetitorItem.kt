@@ -32,30 +32,28 @@ fun CompetitorItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = "${competitor.lastName} ${competitor.firstName}", style = MaterialTheme.typography.titleMedium)
                 Text(text = "Genre: ${competitor.gender}  Tel: ${competitor.phone}", style = MaterialTheme.typography.bodyMedium)
             }
 
-            // Checkbox pour sélectionner uniquement les nouveaux compétiteurs
+            Row {
+                IconButton(onClick = onDelete) {
+                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
+                }
+            }
+
             if (!isAlreadyAdded) {
+                // 📌 Ajout de la checkbox
                 Checkbox(
                     checked = isSelected,
                     onCheckedChange = onSelectionChange
                 )
             }
-
-            // Supprimer uniquement les compétiteurs non ajoutés
-            if (!isAlreadyAdded) {
-                IconButton(onClick = onDelete) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
-                }
-            }
         }
     }
 }
+
+

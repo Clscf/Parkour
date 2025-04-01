@@ -32,6 +32,7 @@ import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import com.example.parkour.ui.viewmodel.CompetitorViewModel
 import com.example.parkour.viewmodel.CourseViewModel
 import com.example.parkour.ui.screens.CreateObstacleView  // Ajout de l'import de CreateObstacleView
+import com.example.parkour.ui.view.CompetitionEditorView
 import com.example.parkour.viewmodel.ObstacleViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -134,7 +135,7 @@ fun AppNavigation() {
             arguments = listOf(navArgument("competitionId") { type = NavType.IntType })
         ) { backStackEntry ->
             val competitionId = backStackEntry.arguments?.getInt("competitionId") ?: return@composable
-            //UpdateCompetitionView(competitionViewModel, navController, competitionId)
+            CompetitionEditorView(competitionViewModel, courseViewModel,  navController, competitionId)
         }
 
         // Détails de la compétition

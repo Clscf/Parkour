@@ -34,21 +34,17 @@ fun CompetitorView(
     val alreadyAddedCompetitors = viewModelCompetition.getCompetitorsForCompetition(competitionId)
         .collectAsState(initial = emptyList()).value
 
-    val filteredCompetitors = competitors.filter { competitor ->
-        val birthDate = try {
-            LocalDate.parse(competitor.bornAt)
-        } catch (e: Exception) {
-            null
-        }
+    val alreadyAddedIds = alreadyAddedCompetitors.map { it.id }.toSet()
 
+    val filteredCompetitors = competitors.filter { competitor ->
+        val birthDate = runCatching { LocalDate.parse(competitor.bornAt) }.getOrNull()
         val isAgeValid = birthDate?.let {
-            val currentDate = LocalDate.now()
-            val age = Period.between(it, currentDate).years
+            val age = Period.between(it, LocalDate.now()).years
             age in (competition?.ageMin ?: 0)..(competition?.ageMax ?: Int.MAX_VALUE)
         } ?: false
 
         val isGenderValid = competition?.gender == null || competitor.gender == competition.gender
-        val isAlreadyAdded = alreadyAddedCompetitors.any { it.id == competitor.id }
+        val isAlreadyAdded = competitor.id in alreadyAddedIds
 
         isAgeValid && isGenderValid && !isAlreadyAdded
     }
@@ -72,12 +68,15 @@ fun CompetitorView(
                     selectedCompetitors.forEach { competitor ->
                         viewModelCompetition.addCompetitorToCompetition(competitionId, competitor)
                     }
-                    selectedCompetitors = emptySet()
+                    selectedCompetitors = emptySet() // Réinitialiser la sélection
+                    navController.popBackStack() // Retour à l'écran précédent après ajout
                 },
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                enabled = selectedCompetitors.isNotEmpty()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                enabled = selectedCompetitors.isNotEmpty() // Le bouton est actif si au moins un compétiteur est sélectionné
             ) {
-                Text("Ajouter aux compétitions")
+                Text("Ajouter ${selectedCompetitors.size} compétiteur(s)")
             }
         }
     ) { innerPadding ->
@@ -95,17 +94,18 @@ fun CompetitorView(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(filteredCompetitors) { competitor ->
+                        val isSelected = selectedCompetitors.contains(competitor)
                         CompetitorItem(
                             competitor = competitor,
-                            isSelected = selectedCompetitors.contains(competitor),
-                            onSelectionChange = { isSelected ->
-                                selectedCompetitors = if (isSelected) {
-                                    selectedCompetitors + competitor
+                            isSelected = isSelected,
+                            onSelectionChange = { isChecked ->
+                                selectedCompetitors = if (isChecked) {
+                                    selectedCompetitors + competitor // Ajouter à la sélection
                                 } else {
-                                    selectedCompetitors - competitor
+                                    selectedCompetitors - competitor // Retirer de la sélection
                                 }
                             },
-                            onDelete = {},
+                            onDelete = {}, // Pas besoin de suppression ici
                             isAlreadyAdded = false
                         )
                     }
@@ -114,3 +114,5 @@ fun CompetitorView(
         }
     }
 }
+
+
