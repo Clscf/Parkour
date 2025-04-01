@@ -29,11 +29,11 @@ fun CreateCompetitionView(
     var nameError by remember { mutableStateOf(false) } // Gérer l'erreur
     var ageMin by remember { mutableStateOf(18) }
     var ageMax by remember { mutableStateOf(30) }
-    var gender by remember { mutableStateOf("Gender") }
+    var gender by remember { mutableStateOf("Genre") }
     var expandedGender by remember { mutableStateOf(false) }
     var hasTry by remember { mutableStateOf(0) }
     var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf("Option 1") }
+    var selectedOption by remember { mutableStateOf("Essai") }
 
     Column(
         modifier = Modifier

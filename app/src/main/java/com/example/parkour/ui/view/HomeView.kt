@@ -144,25 +144,27 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
         Column(
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(16.dp), // Ajout d'un padding général pour éviter que les éléments touchent les bords
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Compétitions disponibles",
                 style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(bottom = 16.dp) // Un peu d'espace sous le titre
             )
 
             if (competitions.isEmpty()) {
-                Text("Aucune compétition disponible.")
+                // Afficher si aucune compétition n'est disponible
+                Text("Aucune compétition disponible.", modifier = Modifier.padding(bottom = 16.dp))
             } else {
                 OutlinedTextField(
                     value = selectedCompetition?.name ?: "Sélectionner une compétition",
                     onValueChange = {},
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .padding(bottom = 16.dp) // Espacement sous le champ de sélection
                         .clickable { expanded = true },
                     readOnly = true
                 )
@@ -186,13 +188,14 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                 }
 
                 selectedCompetition?.let { competition ->
+                    // Affichage de la compétition sélectionnée
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.SpaceBetween // Mise en page propre des éléments
                         ) {
                             Text(
                                 "Courses associées :",
@@ -209,7 +212,9 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
 
                         if (courses.isNotEmpty()) {
                             LazyColumn(
-                                modifier = Modifier.fillMaxWidth().padding(8.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp) // Ajout d'un espacement en bas de la liste
                             ) {
                                 items(courses) { course ->
                                     CourseItem(
@@ -222,37 +227,40 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                         } else {
                             Text(
                                 "Aucune course associée.",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier.padding(bottom = 16.dp)
                             )
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
-
+                        // Section des boutons modifier, supprimer et arbitrer
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 8.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Button(onClick = { navController.navigate("updateCompetition/${competition.id}") }) {
-                                Button(
-                                    onClick = { navController.navigate("updateCompetition/${competition.id}") },
-                                    modifier = Modifier.padding(8.dp)
-                                ) {
-                                    Text("Modifier")
-                                }
-                                Button(onClick = { viewModel.deleteCompetition(competition.id) }) {
-                                    Button(
-                                        onClick = { viewModel.deleteCompetition(competition.id) },
-                                        modifier = Modifier.padding(8.dp)
-                                    ) {
-                                        Text("Supprimer")
-                                    }
-                                    Button(onClick = { navController.navigate("arbitration/${competition.id}/1") }) {
-                                        Text("Arbitrer")
-                                    }
-                                }
+                            Button(
+                                onClick = { navController.navigate("updateCompetition/${competition.id}") },
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Text("Modifier")
+                            }
+                            Button(
+                                onClick = { viewModel.deleteCompetition(competition.id) },
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Text("Supprimer")
+                            }
+                            Button(
+                                onClick = { navController.navigate("arbitration/${competition.id}/1") },
+                                modifier = Modifier.padding(end = 8.dp)
+                            ) {
+                                Text("Arbitrer")
                             }
                         }
                     }
+                }
+            }
 
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }, modifier = Modifier.fillMaxWidth()) {
                         competitions.forEach { competition ->
@@ -294,14 +302,13 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f)) // Pour pousser les éléments vers le haut
 
-                    Button(
-                        onClick = { navController.navigate("createCompetition") },
-                        modifier = Modifier.padding(16.dp)
-                    ) {
-                        Text("Créer une compétition")
-                    }
-                }
+            Button(
+                onClick = { navController.navigate("createCompetition") },
+                modifier = Modifier.padding(bottom = 16.dp)
+            ) {
+                Text("Créer une compétition")
             }
         }
     }

@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.core.ktx)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.core)
+    implementation(libs.androidx.media3.common.ktx)
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0") // API JUnit Jupiter

@@ -1,61 +1,64 @@
 package com.example.parkour.ui.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.uptdate.CourseUpdate
 import com.example.parkour.viewmodel.CourseViewModel
+import com.example.parkour.viewmodel.ObstacleViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateCourseView(courseId: Int, viewModel: CourseViewModel, navController: NavController) {
-    val courses = viewModel.courses.collectAsState().value
+fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleViewModel: ObstacleViewModel, navController: NavController) {
+    val courses = courseViewModel.courses.collectAsState().value
     val course = courses.find { it.id == courseId }
-    Log.d("UpdateCourseView", "Course ID reçu: $courseId")
-    Log.d("UpdateCourseView", "Liste des courses: ${courses.map { it.id }}")
+    val obstacles = obstacleViewModel.obstacles.collectAsState().value
 
+    // Définir les variables d'état pour le nom et la durée de la course
     var courseName by remember { mutableStateOf(course?.name ?: "") }
     var maxDuration by remember { mutableStateOf(course?.maxDuration?.toString() ?: "") }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Modifier la Course") })
-        },
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Top
-            ) {
-                if (course == null) {
-                    Text("Course introuvable", style = MaterialTheme.typography.bodyLarge)
-                    Button(onClick = { navController.popBackStack() }) {
-                        Text("Retour")
-                    }
-                } else {
+    // Charger les obstacles de la course
+    LaunchedEffect(courseId) {
+        courseViewModel.loadObstaclesForCourse(courseId)
+        obstacleViewModel.loadAllObstacles() // Charger tous les obstacles existants
+    }
+
+    // Si la course est trouvée, afficher l'interface
+    if (course != null) {
+        Scaffold(
+            content = { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.Top
+                ) {
                     Text("Modifier la course", style = MaterialTheme.typography.headlineSmall)
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Nom de la course
                     OutlinedTextField(
-                        value = courseName,
-                        onValueChange = { courseName = it },
+                        value = courseName,  // Utilisez courseName pour lier l'état
+                        onValueChange = { courseName = it },  // Met à jour courseName lorsqu'une modification est faite
                         label = { Text("Nom de la course") },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Durée maximale de la course
                     OutlinedTextField(
-                        value = maxDuration,
-                        onValueChange = { maxDuration = it },
+                        value = maxDuration,  // Utilisez maxDuration pour lier l'état
+                        onValueChange = { maxDuration = it },  // Met à jour maxDuration lorsqu'une modification est faite
                         label = { Text("Durée maximale (minutes)") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
@@ -63,6 +66,45 @@ fun UpdateCourseView(courseId: Int, viewModel: CourseViewModel, navController: N
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Affichage des obstacles associés à la course
+                    Text("Obstacles associés :", style = MaterialTheme.typography.bodyLarge)
+
+                    // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp) // Limite de hauteur
+                    ) {
+                        items(obstacles) { obstacle ->
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text(text = obstacle.name, style = MaterialTheme.typography.bodyMedium)
+                                Button(
+                                    onClick = {
+                                        courseViewModel.addObstacleToCourse(courseId, obstacle.id)
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                ) {
+                                    Text("+")
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Bouton pour naviguer vers la page de création d'obstacle
+                    Button(
+                        onClick = {
+                            navController.navigate("create_obstacle_view/$courseId")
+                        }
+                    ) {
+                        Text("Ajouter un nouvel obstacle")
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Boutons de sauvegarde et annulation
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -73,14 +115,15 @@ fun UpdateCourseView(courseId: Int, viewModel: CourseViewModel, navController: N
 
                         Button(
                             onClick = {
+                                // Sauvegarder les changements de la course
                                 val updatedCourse = CourseUpdate(
-                                    name = courseName,
-                                    maxDuration = maxDuration.toIntOrNull() ?: course.maxDuration,
+                                    name = courseName,  // Utilisez courseName ici
+                                    maxDuration = maxDuration.toIntOrNull() ?: course.maxDuration,  // Convertissez maxDuration en Int
                                     position = course.position,
                                     isOver = course.isOver,
                                     competitionId = course.competitionId
                                 )
-                                viewModel.updateCourse(courseId, updatedCourse)
+                                courseViewModel.updateCourse(courseId, updatedCourse)
                                 navController.popBackStack()
                             }
                         ) {
@@ -89,6 +132,12 @@ fun UpdateCourseView(courseId: Int, viewModel: CourseViewModel, navController: N
                     }
                 }
             }
-        }
-    )
+        )
+    } else {
+        // Si la course n'est pas trouvée
+        Text("Course introuvable", style = MaterialTheme.typography.bodyLarge)
+    }
 }
+
+
+

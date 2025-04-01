@@ -60,6 +60,22 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
         }
     }
 
+    fun loadCourses() {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCourse()
+                if (response.isSuccessful) {
+                    _courses.value = response.body() ?: emptyList()
+                    Log.d("CourseViewModel", "Courses chargées : ${_courses.value}")
+                } else {
+                    Log.e("CourseViewModel", "Erreur lors du chargement : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CourseViewModel", "Exception lors du chargement des courses : ${e.message}")
+            }
+        }
+    }
+
     fun addCompetition(competitionCreate: CompetitionCreate) {
         viewModelScope.launch {
             try {

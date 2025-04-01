@@ -1,6 +1,8 @@
 package com.example.parkour.ui.screen
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavType
@@ -16,6 +18,8 @@ import com.example.parkour.repository.CompetitionRepository
 import com.example.parkour.repository.CompetitorRepository
 import com.example.parkour.ui.view.ArbitrationView
 import com.example.parkour.repository.CourseRepository
+import com.example.parkour.repository.ObstacleRepository
+import com.example.parkour.ui.screens.CreateObstacleView
 import com.example.parkour.ui.screens.UpdateCourseView
 import com.example.parkour.ui.view.CompetitorView
 import com.example.parkour.ui.view.CreateCompetitionView
@@ -25,7 +29,10 @@ import com.example.parkour.viewmodel.ArbitrationViewModel
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 import com.example.parkour.ui.viewmodel.CompetitorViewModel
 import com.example.parkour.viewmodel.CourseViewModel
+import com.example.parkour.ui.screens.CreateObstacleView  // Ajout de l'import de CreateObstacleView
+import com.example.parkour.viewmodel.ObstacleViewModel
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun AppNavigation() {
@@ -36,6 +43,7 @@ fun AppNavigation() {
     val arbitrationViewModel = remember { ArbitrationViewModel(ArbitrationRepository(apiService)) }
     val courseViewModel = remember { CourseViewModel(CourseRepository(apiService)) }
     val competitorViewModel = remember { CompetitorViewModel(CompetitorRepository(apiService))  }
+    val obstacleViewModel = remember { ObstacleViewModel(ObstacleRepository(apiService)) }
 
     NavHost(navController = navController, startDestination = "home") {
         // Page d'accueil
@@ -108,7 +116,16 @@ fun AppNavigation() {
             arguments = listOf(navArgument("courseId") { type = NavType.IntType })
         ) { backStackEntry ->
             val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
-            UpdateCourseView(courseId = courseId, viewModel = courseViewModel, navController = navController)
+            UpdateCourseView(courseId = courseId, courseViewModel = courseViewModel, obstacleViewModel = obstacleViewModel, navController = navController)
+        }
+
+        // Page de création de l'obstacle
+        composable(
+            "create_obstacle_view/{courseId}",
+            arguments = listOf(navArgument("courseId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
+            CreateObstacleView(courseId = courseId, viewModel = courseViewModel, viewModel2 = obstacleViewModel, navController = navController)
         }
 
 
