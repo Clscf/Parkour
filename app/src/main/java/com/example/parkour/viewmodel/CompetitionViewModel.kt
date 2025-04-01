@@ -6,14 +6,17 @@ import androidx.lifecycle.viewModelScope
 import com.example.parkour.data.model.create.CompetitionCreate
 import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.Competitor
+import com.example.parkour.data.model.CompetitorIdRequest
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.Obstacle
 import com.example.parkour.data.model.create.CompetitorCreate
 import com.example.parkour.data.model.create.CourseCreate
 import com.example.parkour.data.model.uptdate.CompetitionUpdate
 import com.example.parkour.repository.CompetitionRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class CompetitionViewModel(private val repository: CompetitionRepository) : ViewModel() {
@@ -171,23 +174,23 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     fun addCompetitorToCompetition(competitionId: Int, competitor: Competitor) {
         viewModelScope.launch {
             try {
-                val response = repository.addCompetitorToCompetition(competitionId, competitor)
+                Log.d("CompetitionViewModel", "Tentative d'ajout : competitionId=$competitionId, competitor=$competitor")
+                val response = repository.addCompetitorToCompetition(competitionId, CompetitorIdRequest(competitor.id))
                 if (response.isSuccessful) {
                     Log.d("CompetitionViewModel", "Compétiteur ajouté avec succès")
                     loadCompetitionCompetitors(competitionId)
                 } else {
-                    Log.e("CompetitionViewModel", "Erreur lors de l'ajout du compétiteur : ${response.code()} - ${response.message()}")
-                }
+                    Log.e("CompetitionViewModel", "Erreur lors de l'ajout du compétiteureeee : ${response.code()} - ${response.message()}")                }
             } catch (e: Exception) {
                 Log.e("CompetitionViewModel", "Erreur lors de l'ajout du compétiteur : ${e.message}")
             }
         }
     }
 
-    fun removeCompetitorFromCompetition(competitorId: Int, competitionId: Int) {
+    fun removeCompetitorFromCompetition(competitionId: Int, competitorId: Int) {
         viewModelScope.launch {
             try {
-                val response = repository.removeCompetitorFromCompetition(competitorId, competitionId)
+                val response = repository.removeCompetitorFromCompetition(competitionId, competitorId)
                 if (response.isSuccessful) {
                     loadCompetitionCompetitors(competitionId)
                     Log.d("CompetitionViewModel", "Compétiteur supprimé avec succès")
@@ -199,6 +202,14 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
             }
         }
     }
+
+    fun getCompetitorsForCompetition(competitionId: Int): Flow<List<Competitor>> {
+        return _competitors.map { competitors ->
+            competitors.filter { competitor -> competitor.id == competitionId }
+        }
+    }
+
+
 
 
 

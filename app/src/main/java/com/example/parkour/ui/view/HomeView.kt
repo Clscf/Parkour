@@ -128,6 +128,8 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
     val competitionDeleted = viewModel.competitionDeleted.collectAsState().value
     var expanded by remember { mutableStateOf(false) }
     var selectedCompetition by remember { mutableStateOf<Competition?>(null) }
+    val competitors = viewModel.competitors.collectAsState().value
+
 
     // Réinitialisation automatique après suppression
     if (competitionDeleted) {
@@ -176,6 +178,7 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                             onClick = {
                                 selectedCompetition = competition
                                 viewModel.loadCoursesForCompetition(competition.id)
+                                viewModel.loadCompetitionCompetitors(competition.id)
                                 expanded = false
                             }
                         )
@@ -264,7 +267,6 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                             )
                         }
                     }
-                    val competitors = viewModel.competitors.collectAsState().value
 
                     selectedCompetition?.let { competition ->
                         Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
@@ -279,7 +281,7 @@ fun HomeView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, 
                                     items(competitors) { competitor ->
                                         Row(modifier = Modifier.fillMaxWidth().padding(8.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                                             Text(competitor.firstName, style = MaterialTheme.typography.bodyMedium)
-                                            Button(onClick = { /* Gérer la suppression si nécessaire */ }) {
+                                            Button(onClick = { viewModel.removeCompetitorFromCompetition(competition.id, competitor.id)  }) {
                                                 Text("Supprimer")
                                             }
                                         }

@@ -29,7 +29,7 @@ interface ApiService {
     suspend fun getCompetitionCompetitors(@Path("id") id: Int): Response<List<Competitor>>
 
     @POST("/api/competitions/{id}/add_competitor")
-    suspend fun addCompetitorToCompetition(@Path("id") id: Int, @Body competitor: Competitor): Response<Unit>
+    suspend fun addCompetitorToCompetition(@Path("id") id: Int, @Body request: CompetitorIdRequest): Response<Unit>
 
     @DELETE("/api/competitions/{id}/remove_competitor/{id_competitor}")
     suspend fun removeCompetitorFromCompetition(@Path("id") id: Int, @Path("id_competitor") competitorId: Int): Response<Unit>

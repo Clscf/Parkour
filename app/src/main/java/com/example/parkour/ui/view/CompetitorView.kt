@@ -1,7 +1,6 @@
 package com.example.parkour.ui.view
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +19,6 @@ import com.example.parkour.ui.viewmodel.CompetitorViewModel
 import java.time.LocalDate
 import java.time.Period
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,37 +26,34 @@ fun CompetitorView(
     viewModelCompetition: CompetitionViewModel,
     viewModelCompetitor: CompetitorViewModel,
     navController: NavController,
-    competitionId: Int // Ajouter competitionId pour gérer l'ajout et la suppression
+    competitionId: Int
 ) {
-    // Liste des compétiteurs
     val competitors = viewModelCompetitor.competitors.collectAsState().value
-
-    // Récupérer les critères de la compétition
     val competition = viewModelCompetition.competitions.collectAsState().value
         .find { it.id == competitionId }
+    val alreadyAddedCompetitors = viewModelCompetition.getCompetitorsForCompetition(competitionId)
+        .collectAsState(initial = emptyList()).value
 
-    // Filtrer les compétiteurs en fonction de l'âge (calculé à partir de la date de naissance) et du genre
     val filteredCompetitors = competitors.filter { competitor ->
-        // Convertir la chaîne de date de naissance en LocalDate
         val birthDate = try {
-            LocalDate.parse(competitor.bornAt)  // Supposons que bornAt soit au format "yyyy-MM-dd"
+            LocalDate.parse(competitor.bornAt)
         } catch (e: Exception) {
-            null  // Si la date est invalide, on ignore ce compétiteur
+            null
         }
 
-        // Si la date de naissance est valide, on peut procéder au calcul de l'âge
         val isAgeValid = birthDate?.let {
             val currentDate = LocalDate.now()
             val age = Period.between(it, currentDate).years
-            age >= (competition?.ageMin ?: 0) && age <= (competition?.ageMax ?: Int.MAX_VALUE)
-        } ?: false  // Si la date est invalide, on considère que l'âge n'est pas valide
-        
-        val isGenderValid = competition?.gender == null || competitor.gender == competition.gender
+            age in (competition?.ageMin ?: 0)..(competition?.ageMax ?: Int.MAX_VALUE)
+        } ?: false
 
-        isAgeValid && isGenderValid
+        val isGenderValid = competition?.gender == null || competitor.gender == competition.gender
+        val isAlreadyAdded = alreadyAddedCompetitors.any { it.id == competitor.id }
+
+        isAgeValid && isGenderValid && !isAlreadyAdded
     }
 
-    var selectedCompetitors by remember { mutableStateOf<MutableSet<Competitor>>(mutableSetOf()) }
+    var selectedCompetitors by remember { mutableStateOf(setOf<Competitor>()) }
 
     Scaffold(
         topBar = {
@@ -77,6 +72,7 @@ fun CompetitorView(
                     selectedCompetitors.forEach { competitor ->
                         viewModelCompetition.addCompetitorToCompetition(competitionId, competitor)
                     }
+                    selectedCompetitors = emptySet()
                 },
                 modifier = Modifier.fillMaxWidth().padding(16.dp),
                 enabled = selectedCompetitors.isNotEmpty()
@@ -103,15 +99,14 @@ fun CompetitorView(
                             competitor = competitor,
                             isSelected = selectedCompetitors.contains(competitor),
                             onSelectionChange = { isSelected ->
-                                if (isSelected) {
-                                    selectedCompetitors.add(competitor)
+                                selectedCompetitors = if (isSelected) {
+                                    selectedCompetitors + competitor
                                 } else {
-                                    selectedCompetitors.remove(competitor)
+                                    selectedCompetitors - competitor
                                 }
                             },
-                            onDelete = {
-                                viewModelCompetition.removeCompetitorFromCompetition(competitor.id, competitionId)
-                            }
+                            onDelete = {},
+                            isAlreadyAdded = false
                         )
                     }
                 }
@@ -119,5 +114,3 @@ fun CompetitorView(
         }
     }
 }
-
-
