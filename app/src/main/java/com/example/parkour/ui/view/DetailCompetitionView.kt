@@ -43,11 +43,6 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, competitionId: Int, n
             )
         },
         bottomBar = { SimpleBottomNavigation(navController = navController) },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("addCompetitorCompetition/${competitionId}") }) {
-                Icon(Icons.Default.Add, contentDescription = "Ajouter un compétiteur")
-            }
-        }
     ) { innerPadding ->
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -88,6 +83,10 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, competitionId: Int, n
                             Text("Aucun compétiteur inscrit.", style = MaterialTheme.typography.bodyMedium)
                         } else {
                             LazyColumn { items(competitors) { Text("- ${it.firstName} ${it.lastName}") } }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Button(onClick = { navController.navigate("addCompetitorCompetition/${competitionId}") }) {
+                            Text("Ajouter un compétiteur")
                         }
                     }
 
