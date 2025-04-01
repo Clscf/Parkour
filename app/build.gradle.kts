@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.0" // essayer une version antérieure
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
     id("org.jetbrains.kotlin.kapt")
 }
 
@@ -45,6 +45,7 @@ android {
         jvmTarget = "11"
         freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
     }
+
 }
 
 dependencies {
