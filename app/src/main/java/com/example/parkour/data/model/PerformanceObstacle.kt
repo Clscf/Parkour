@@ -1,0 +1,19 @@
+package com.example.parkour.data.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Entity
+data class PerformanceObstacle(
+    @PrimaryKey val id: Int,
+    @SerialName("obstacle_id") val obstacleId: Int,
+    @SerialName("performance_id") val performanceId: Int,
+    @SerialName("has_fell") val hasFell: Int,
+    @SerialName("to_verify") val toVerify: Int,
+    val time: Int,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("updated_at") val updatedAt: String
+)
