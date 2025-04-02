@@ -29,129 +29,137 @@ fun UpdateCompetitionView(
     var expanded by remember { mutableStateOf(false) }
     val selectedOption = if (hasRetry == 1) "Oui" else "Non"
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "Modifier la compétition", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        TextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Nom de la compétition") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = ageMin.toString(),
-            onValueChange = { ageMin = it.toIntOrNull() ?: competition.ageMin },
-            label = { Text("Âge minimum") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        TextField(
-            value = ageMax.toString(),
-            onValueChange = { ageMax = it.toIntOrNull() ?: competition.ageMax },
-            label = { Text("Âge maximum") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Box(modifier = Modifier.padding(top = 16.dp)) {
-            Text(
-                text = gender,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Gray)
-                    .padding(16.dp)
-                    .clickable { expandedGender = true }
-            )
-            DropdownMenu(
-                expanded = expandedGender,
-                onDismissRequest = { expandedGender = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Homme") },
+    Scaffold(
+        bottomBar = {
+            BottomAppBar {
+                Button(
                     onClick = {
-                        gender = "H"
-                        expandedGender = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Femme") },
-                    onClick = {
-                        gender = "F"
-                        expandedGender = false
-                    }
-                )
+                        val updatedCompetition = CompetitionUpdate(
+                            name = name,
+                            ageMin = ageMin,
+                            ageMax = ageMax,
+                            gender = gender,
+                            hasRetry = hasRetry,
+                            status = competition.status
+                        )
+                        viewModel.updateCompetition(competitionId, updatedCompetition)
+                        navController.popBackStack()
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                ) {
+                    Text("Mettre à jour")
+                }
+
+                Button(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                ) {
+                    Text("Annuler")
+                }
             }
         }
-
-        Box(modifier = Modifier.padding(top = 16.dp)) {
-            Text(
-                text = selectedOption,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(1.dp, Color.Gray)
-                    .padding(16.dp)
-                    .clickable { expanded = true }
-            )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text("Oui") },
-                    onClick = {
-                        hasRetry = 1
-                        expanded = false
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text("Non") },
-                    onClick = {
-                        hasRetry = 0
-                        expanded = false
-                    }
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                val updatedCompetition = CompetitionUpdate(
-                    name = name,
-                    ageMin = ageMin,
-                    ageMax = ageMax,
-                    gender = gender,
-                    hasRetry = hasRetry,
-                    status = competition.status
-                )
-                viewModel.updateCompetition(competitionId, updatedCompetition) // Passer l'ID ici
-                navController.popBackStack()
-            },
-            modifier = Modifier.fillMaxWidth()
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(bottom = paddingValues.calculateBottomPadding()), // Ajuste la hauteur du contenu
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Mettre à jour la compétition")
-        }
+            Text(text = "Modifier la compétition", style = MaterialTheme.typography.headlineMedium)
 
-        Button(onClick = {
-            navController.popBackStack()
-        }) {
-            Text("Annuler")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TextField(
+                value = name,
+                onValueChange = { name = it },
+                label = { Text("Nom de la compétition") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = ageMin.toString(),
+                onValueChange = { ageMin = it.toIntOrNull() ?: competition.ageMin },
+                label = { Text("Âge minimum") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TextField(
+                value = ageMax.toString(),
+                onValueChange = { ageMax = it.toIntOrNull() ?: competition.ageMax },
+                label = { Text("Âge maximum") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Box(modifier = Modifier.padding(top = 16.dp)) {
+                Text(
+                    text = gender,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Gray)
+                        .padding(16.dp)
+                        .clickable { expandedGender = true }
+                )
+                DropdownMenu(
+                    expanded = expandedGender,
+                    onDismissRequest = { expandedGender = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Homme") },
+                        onClick = {
+                            gender = "H"
+                            expandedGender = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Femme") },
+                        onClick = {
+                            gender = "F"
+                            expandedGender = false
+                        }
+                    )
+                }
+            }
+
+            Box(modifier = Modifier.padding(top = 16.dp)) {
+                Text(
+                    text = selectedOption,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Gray)
+                        .padding(16.dp)
+                        .clickable { expanded = true }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Oui") },
+                        onClick = {
+                            hasRetry = 1
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Non") },
+                        onClick = {
+                            hasRetry = 0
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
     }
 }
-

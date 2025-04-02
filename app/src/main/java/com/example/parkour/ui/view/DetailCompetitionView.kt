@@ -1,10 +1,12 @@
+package com.example.parkour.ui.view
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,14 +15,16 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.ui.items.CardTitleItem
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
-import com.example.parkour.ui.view.SimpleBottomNavigation
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import com.example.parkour.viewmodel.CourseViewModel
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, competitionId: Int, navController: NavController) {
+fun DetailCompetitionView(
+    viewModel: CompetitionViewModel,
+    courseViewModel: CourseViewModel,
+    competitionId: Int,
+    navController: NavController
+) {
     val competition by viewModel.selectedCompetition.collectAsState()
     val courses by viewModel.courses.collectAsState()
     val obstacles by viewModel.obstacles.collectAsState()
@@ -46,6 +50,16 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 }
             )
         },
+        bottomBar = {
+            BottomAppBar {
+                Button(
+                    onClick = { navController.navigate("addCompetitorCompetition/${competitionId}") },
+                    modifier = Modifier.fillMaxWidth().padding(8.dp)
+                ) {
+                    Text("Ajouter un compétiteur")
+                }
+            }
+        }
     ) { innerPadding ->
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -69,11 +83,10 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                         if (courses.isEmpty()) {
                             Text("Aucune course disponible.", style = MaterialTheme.typography.bodyMedium)
                         } else {
-
                             var expandedCourseId by remember { mutableStateOf<Int?>(null) }
                             val courseObstacles by courseViewModel.courseObstacles.collectAsState()
 
-                            LazyColumn(Modifier.height(300.dp)) {
+                            LazyColumn(Modifier.height(200.dp)) {
                                 items(courses) { course ->
                                     Column {
                                         Row(
@@ -83,7 +96,6 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text("- ${course.name}", modifier = Modifier.weight(1f))
-
                                             IconButton(onClick = {
                                                 if (expandedCourseId == course.id) {
                                                     expandedCourseId = null
@@ -114,28 +126,16 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                                     }
                                 }
                             }
-
-
                         }
                     }
-
-
 
                     CardTitleItem("Compétiteurs") {
                         if (competitors.isEmpty()) {
                             Text("Aucun compétiteur inscrit.", style = MaterialTheme.typography.bodyMedium)
                         } else {
-                            LazyColumn(Modifier.height(140.dp)) { items(competitors) { Text("- ${it.firstName} ${it.lastName}") } }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(onClick = { navController.navigate("addCompetitorCompetition/${competitionId}") }) {
-                            Text("Ajouter un compétiteur")
-                        }
-                    }
-
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Button(onClick = { navController.navigate("arbitration/${competition!!.id}/1") }) {
-                            Text("Arbitrer")
+                            LazyColumn(Modifier.height(140.dp)) {
+                                items(competitors) { Text("- ${it.firstName} ${it.lastName}") }
+                            }
                         }
                     }
                 }
@@ -145,5 +145,3 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
         }
     }
 }
-
-

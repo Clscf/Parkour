@@ -169,6 +169,7 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
                 if (response.isSuccessful) {
                     Log.d("CompetitionViewModel", "Parcours ajouté avec succès : ${response.body()}")
                     _courses.value += (response.body() ?: return@launch)
+                    loadCoursesForCompetition(courseCreate.competitionId)
                 } else {
                     Log.e("CompetitionViewModel", "Erreur lors de l'ajout du parcours : ${response.code()} - ${response.message()}")
                 }
