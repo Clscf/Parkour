@@ -25,7 +25,7 @@ import com.example.parkour.data.model.Competition
 @Composable
 fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
     val competitions = viewModel.competitions.collectAsState().value
-    var isEditing by remember { mutableStateOf(false) }
+    val isEditing by viewModel.isEditMode.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -40,8 +40,8 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Bouton toggle mode éditeur
-            EditorModeToggle(isEditing) { newState ->
-                isEditing = newState
+            EditorModeToggle(isEditing) {
+                viewModel.toggleEditMode() // Appelle la fonction du ViewModel
             }
 
             Text(
@@ -64,20 +64,15 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
 }
 
 @Composable
-fun EditorModeToggle(isEditing: Boolean, onToggle: (Boolean) -> Unit) {
-    var isChecked by remember { mutableStateOf(isEditing) }
-
+fun EditorModeToggle(isEditing: Boolean, onToggle: () -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clickable {
-                isChecked = !isChecked
-                onToggle(isChecked)
-            }
+            .clickable { onToggle() } // Inverse l'état via ViewModel
             .padding(8.dp)
     ) {
         Text(
-            text = if (isChecked) "Mode Édition: ON" else "Mode Édition: OFF",
+            text = if (isEditing) "Mode Édition: ON" else "Mode Édition: OFF",
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -88,14 +83,14 @@ fun EditorModeToggle(isEditing: Boolean, onToggle: (Boolean) -> Unit) {
                 .width(50.dp)
                 .height(30.dp)
                 .clip(RoundedCornerShape(15.dp))
-                .background(if (isChecked) Color.Blue else Color.Gray)
+                .background(if (isEditing) MaterialTheme.colorScheme.primary else Color.Gray)
                 .padding(horizontal = 4.dp),
             contentAlignment = Alignment.CenterStart
         ) {
             Box(
                 modifier = Modifier
                     .size(22.dp)
-                    .offset(x = if (isChecked) 20.dp else 0.dp)
+                    .offset(x = if (isEditing) 20.dp else 0.dp)
                     .clip(CircleShape)
                     .background(Color.White)
                     .animateContentSize()
@@ -103,3 +98,4 @@ fun EditorModeToggle(isEditing: Boolean, onToggle: (Boolean) -> Unit) {
         }
     }
 }
+
