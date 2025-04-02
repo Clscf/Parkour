@@ -9,6 +9,7 @@ import androidx.navigation.NavController
 import com.example.parkour.data.model.Competition
 
 @Composable
+<<<<<<< HEAD
 fun CompetitionItem(competition: Competition, navController: NavController, isEditorMode: Boolean) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -32,8 +33,20 @@ fun CompetitionItem(competition: Competition, navController: NavController, isEd
                         .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+<<<<<<< HEAD
                     Button(onClick = { navController.navigate("competitionEditor/${competition.id}") }, enabled = !isEditorMode) {
                         Text("Gérer")
+=======
+                    if (isEditing){
+                        Button(onClick = { navController.navigate("competitionEditor/${competition.id}") }) {
+                            Text("Gérer")
+                        }
+                    }
+                    else{
+                        Button(onClick = { navController.navigate("competitionEditor/${competition.id}") }, enabled = false) {
+                            Text("Gérer")
+                        }
+>>>>>>> 7f9d0fb75125927e86d5a6316568814278a1392b
                     }
                     Button(onClick = { navController.navigate("competitionDetails/${competition.id}") }) {
                         Text("Détails")

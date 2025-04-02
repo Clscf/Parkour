@@ -42,9 +42,16 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     private val _selectedCompetition = MutableStateFlow<Competition?>(null)
     val selectedCompetition: StateFlow<Competition?> = _selectedCompetition
 
+    private val _isEditMode = MutableStateFlow(false)
+    val isEditMode: StateFlow<Boolean> = _isEditMode
+
     init {
         loadCompetitions()
         //loadCourses()
+    }
+
+    fun toggleEditMode() {
+        _isEditMode.value = !_isEditMode.value
     }
 
     fun loadCompetitions() {
@@ -241,12 +248,6 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     }
 
 
-        private val _isEditing = MutableStateFlow(false)
-        val isEditing: StateFlow<Boolean> get() = _isEditing
-
-        fun setEditing(editing: Boolean) {
-            _isEditing.value = editing
-        }
 
 
 

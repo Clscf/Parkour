@@ -46,7 +46,11 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                     }
                 }
             )
+<<<<<<< HEAD
         }
+=======
+        },
+>>>>>>> 7f9d0fb75125927e86d5a6316568814278a1392b
     ) { innerPadding ->
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

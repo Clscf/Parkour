@@ -26,9 +26,13 @@ import androidx.compose.runtime.collectAsState
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
 @Composable
+<<<<<<< HEAD
 fun SimpleBottomNavigation(navController: NavController, viewModel: CompetitionViewModel) {
     val isEditing by viewModel.isEditing.collectAsState()
 
+=======
+fun SimpleBottomNavigation(navController: NavController, isEditor: Boolean) {
+>>>>>>> 7f9d0fb75125927e86d5a6316568814278a1392b
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,6 +62,7 @@ fun SimpleBottomNavigation(navController: NavController, viewModel: CompetitionV
                 )
             }
         }
+<<<<<<< HEAD
 
         // Icône Créer (désactivé en mode éditeur)
         IconButton(onClick = { if (!isEditing) navController.navigate("createCompetition") }, enabled = !isEditing) {
@@ -78,9 +83,31 @@ fun SimpleBottomNavigation(navController: NavController, viewModel: CompetitionV
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1
                 )
+=======
+        if (isEditor){
+            // Icône Créer
+            IconButton(onClick = { navController.navigate("createCompetition") }) {
+                Column(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Créer",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Créer",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1
+                    )
+                }
+>>>>>>> 7f9d0fb75125927e86d5a6316568814278a1392b
             }
         }
-
         // Icône Arbitrage
         IconButton(onClick = { navController.navigate("arbitration/1/1") }) {
             Column(
