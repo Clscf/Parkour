@@ -8,6 +8,10 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -15,6 +19,7 @@ import com.example.parkour.data.model.Course
 
 @Composable
 fun CourseItem(course: Course, onEdit: () -> Unit, onDelete: () -> Unit) {
+    var showDialog by remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -45,10 +50,31 @@ fun CourseItem(course: Course, onEdit: () -> Unit, onDelete: () -> Unit) {
                 IconButton(onClick = onEdit) {
                     Icon(imageVector = Icons.Default.Edit, contentDescription = "Modifier", tint = Color.Blue)
                 }
-                IconButton(onClick = onDelete) {
+                IconButton(onClick = { showDialog = true }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
                 }
             }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Confirmer la suppression") },
+            text = { Text("Voulez-vous vraiment supprimer cette course ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete()
+                    showDialog = false
+                }) {
+                    Text("Oui", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Annuler")
+                }
+            }
+        )
     }
 }

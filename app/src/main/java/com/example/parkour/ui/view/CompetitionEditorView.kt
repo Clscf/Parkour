@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -17,6 +18,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
@@ -47,6 +50,7 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
     val competition by viewModel.selectedCompetition.collectAsState()
     val courses = viewModel.courses.collectAsState().value
     val competitors = viewModel.competitors.collectAsState().value
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -78,15 +82,20 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 }
             }
 
+            viewModel.loadCoursesForCompetition(competitionId)
+
             if (courses.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp).height(300.dp)) {
                     items(courses) { course ->
                         CourseItem(
                             course = course,
-                            onEdit = { navController.navigate("updateCourse/${course.id}") },
+                            onEdit = {
+                                viewModel.loadCoursesForCompetition(competitionId)
+                                navController.navigate("updateCourse/${course.id}") },
                             onDelete = {
-                                courseViewModel.deleteCourse(course.id)
-                                viewModel.loadCoursesForCompetition(competitionId) // 🔄 Actualisation après suppression
+                                courseViewModel.deleteCourse(course.id, competitionId)
+                                viewModel.loadCoursesForCompetition(competitionId)
+                                // 🔄 Actualisation après suppression
                             }
                         )
                     }
@@ -104,7 +113,7 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 }
 
             if (competitors.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
+                LazyColumn(modifier = Modifier.fillMaxWidth().padding(8.dp).size(250.dp)) {
                     items(competitors) { competitor ->
                         CompetitorItem(
                             competitor = competitor,
@@ -121,6 +130,36 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
             } else {
                 Text("Aucun compétiteur inscrit.", style = MaterialTheme.typography.bodyMedium)
             }
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Button(onClick = { navController.navigate("updateCompetition/${competition!!.id}") }) {
+                    Text("Modifier la competition")
+                }
+                Button(onClick =  { showDialog = true }  ) {
+                    Text("Supprimer")
+                }
+            }
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Confirmer la suppression") },
+            text = { Text("Voulez-vous vraiment supprimer cette compétition ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.deleteCompetition(competition!!.id); navController.popBackStack()
+                    showDialog = false
+                }) {
+                    Text("Oui", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Annuler")
+                }
+            }
+        )
     }
 }

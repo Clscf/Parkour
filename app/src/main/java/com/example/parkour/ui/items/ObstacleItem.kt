@@ -35,7 +35,7 @@ fun ObstacleItem(obstacle: Obstacle, onAdd: () -> Unit) {
             }
             Row {
                 IconButton(onClick = onAdd) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Supprimer", tint = Color.Red)
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Ajouter", tint = Color.Red)
                 }
             }
         }

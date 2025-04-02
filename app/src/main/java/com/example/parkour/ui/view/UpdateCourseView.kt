@@ -30,6 +30,7 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
     // Charger les obstacles de la course
     LaunchedEffect(courseId) {
+        courseViewModel.loadCourses()
         courseViewModel.loadObstaclesForCourse(courseId)
         obstacleViewModel.loadAllObstacles() // Charger tous les obstacles existants
     }

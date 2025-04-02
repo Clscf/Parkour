@@ -5,7 +5,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +20,8 @@ fun CompetitorItem(
     onDelete: () -> Unit,
     isAlreadyAdded: Boolean
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -40,7 +42,7 @@ fun CompetitorItem(
             }
 
             Row {
-                IconButton(onClick = onDelete) {
+                IconButton(onClick = { showDialog = true }) {
                     Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
                 }
             }
@@ -54,6 +56,25 @@ fun CompetitorItem(
             }
         }
     }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Confirmer la suppression") },
+            text = { Text("Voulez-vous vraiment supprimer ce compétiteur ?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    onDelete()
+                    showDialog = false
+                }) {
+                    Text("Oui", color = Color.Red)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Annuler")
+                }
+            }
+        )
+    }
 }
-
-

@@ -40,13 +40,30 @@ class CourseViewModel(private val repository: CourseRepository) : ViewModel() {
         }
     }
 
+    fun loadCoursesForCompetition(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCompetitionCourses(competitionId)
+                if (response.isSuccessful) {
+                    _courses.value = response.body() ?: emptyList()
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${e.message}")
+            }
+        }
+    }
 
-    fun deleteCourse(courseId: Int) {
+
+    fun deleteCourse(courseId: Int, competitionId: Int) {
         viewModelScope.launch {
             try {
                 val response = repository.deleteCourse(courseId)
                 if (response.isSuccessful) {
+                    loadCoursesForCompetition(competitionId)
                     _courses.value = _courses.value.filterNot { it.id == courseId }
+
                     Log.d("CompetitionViewModel", "Parcours supprimé avec succès")
                 } else {
                     Log.e("CompetitionViewModel", "Erreur lors de la suppression : ${response.code()} - ${response.message()}")

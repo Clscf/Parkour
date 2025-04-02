@@ -135,12 +135,6 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Button(onClick = { navController.navigate("updateCompetition/${competition!!.id}") }) {
-                            Text("Modifier")
-                        }
-                        Button(onClick = { viewModel.deleteCompetition(competition!!.id); navController.popBackStack() }) {
-                            Text("Supprimer")
-                        }
                         Button(onClick = { navController.navigate("arbitration/${competition!!.id}/1") }) {
                             Text("Arbitrer")
                         }

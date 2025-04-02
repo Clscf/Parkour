@@ -49,4 +49,8 @@ class CourseRepository(private val apiService: ApiService) {
     suspend fun getObstacles(): Response<List<Obstacle>> {
         return apiService.getObstacles()
     }
+
+    suspend fun getCompetitionCourses(id: Int): Response<List<Course>> {
+        return apiService.getCompetitionCourses(id)
+    }
 }
