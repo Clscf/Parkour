@@ -12,7 +12,7 @@ data class Performance(
     @SerialName("competitor_id") val competitorId: Int,
     @SerialName("course_id") val courseId: Int,
     val status: String,
-    @SerialName("total_time") val totalTime: Double,
+    @SerialName("total_time") val totalTime: Int,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String
 )

@@ -7,5 +7,5 @@ import kotlinx.serialization.Serializable
 data class PerformanceObstacleUpdate(
     @SerialName("has_fell") val hasFell: Int,
     @SerialName("to_verify") val toVerify: Int,
-    val time: Double
+    val time: Int
 )

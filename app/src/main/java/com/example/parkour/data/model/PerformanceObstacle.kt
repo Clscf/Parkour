@@ -13,7 +13,7 @@ data class PerformanceObstacle(
     @SerialName("performance_id") val performanceId: Int,
     @SerialName("has_fell") val hasFell: Int,
     @SerialName("to_verify") val toVerify: Int,
-    val time: Double,
+    val time: Int,
     @SerialName("created_at") val createdAt: String,
     @SerialName("updated_at") val updatedAt: String
 )

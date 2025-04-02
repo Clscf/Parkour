@@ -9,5 +9,5 @@ data class PerformanceObstacleCreate(
     @SerialName("performance_id") val performanceId: Int,
     @SerialName("has_fell") val hasFell: Int,
     @SerialName("to_verify") val toVerify: Int,
-    val time: Double
+    val time: Int
 )

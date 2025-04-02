@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class PerformanceUpdate(
     val status: String,
-    @SerialName("total_time") val totalTime: Double
+    @SerialName("total_time") val totalTime: Int
 )

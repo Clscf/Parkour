@@ -8,5 +8,5 @@ data class PerformanceCreate(
     @SerialName("competitor_id") val competitorId: Int,
     @SerialName("course_id") val courseId: Int,
     val status: String,
-    @SerialName("total_time") val totalTime: Double
+    @SerialName("total_time") val totalTime: Int
 )

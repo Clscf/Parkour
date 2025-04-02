@@ -30,6 +30,7 @@ fun ArbitrationView(
     val competitors by viewModel.competitors.collectAsState()
     val courses by viewModel.courses.collectAsState()
     val obstacles by viewModel.obstacles.collectAsState()
+    val currentObstacle by viewModel.currentObstacle.collectAsState()
 
     var elapsedTime by remember { mutableStateOf(0L) }
     var isTimerRunning by remember { mutableStateOf(false) }
@@ -45,7 +46,6 @@ fun ArbitrationView(
     var expandedCourse by remember { mutableStateOf(false) }
     var selectedCourse by remember { mutableStateOf<Course?>(null) }
 
-    var currentObstacle by remember { mutableStateOf<CourseObstacle?>(null)}
 
     LaunchedEffect(isTimerRunning) {
         viewModel.loadCompetitions()
@@ -272,7 +272,7 @@ fun ArbitrationView(
         // Chute button (kept as in original code)
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
-            viewModel.registerPerformance(elapsedTime.toDouble(), hasFell = true)
+            viewModel.registerPerformance(elapsedTime.toInt(), hasFell = true)
         }) {
             Text("Chute")
         }
@@ -280,7 +280,15 @@ fun ArbitrationView(
         // Obstacle suivant
         Spacer(modifier = Modifier.height(16.dp))
         Button(
-            onClick = { viewModel.moveToNextObstacle() },
+            onClick = {
+                viewModel.moveToNextObstacle(elapsedTime)
+                elapsedTime = 0L // Réinitialiser le timer pour le prochain obstacle
+                lastPausedTime = 0L
+                isTimerRunning = true // Redémarrer automatiquement le timer
+                viewModel.startTimer { time ->
+                    elapsedTime = lastPausedTime + time
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Obstacle suivant")

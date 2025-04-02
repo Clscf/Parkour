@@ -4,6 +4,8 @@ import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.Competitor
 import com.example.parkour.data.model.Course
 import com.example.parkour.data.model.CourseObstacle
+import com.example.parkour.data.model.Performance
+import com.example.parkour.data.model.create.PerformanceCreate
 import com.example.parkour.data.model.PerformanceObstacle
 import com.example.parkour.data.model.create.PerformanceObstacleCreate
 import com.example.parkour.network.ApiService
@@ -36,6 +38,10 @@ class ArbitrationRepository(private val apiService: ApiService) {
 
     suspend fun getCourseForCompetition(competitionId: Int): Response<List<Course>> {
         return apiService.getCompetitionCourses(competitionId)
+    }
+
+    suspend fun createPerformance(performance: PerformanceCreate): Response<Performance> {
+        return apiService.addPerformance(performance)
     }
 
 }

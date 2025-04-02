@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.parkour.data.model.*
+import com.example.parkour.data.model.create.PerformanceCreate
 import com.example.parkour.data.model.create.PerformanceObstacleCreate
 import com.example.parkour.data.repository.ArbitrationRepository
 import kotlinx.coroutines.Job
@@ -38,6 +39,11 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
 
     private val _currentObstacle = MutableStateFlow<CourseObstacle?>(null)
     val currentObstacle: StateFlow<CourseObstacle?> = _currentObstacle
+
+    private val _performanceObstacles = MutableStateFlow<List<PerformanceObstacle>>(emptyList())
+    val performanceObstacles: StateFlow<List<PerformanceObstacle>> = _performanceObstacles
+
+    private var _performanceId: Int? = null
 
     // Charger les compétitions
     fun loadCompetitions() {
@@ -84,6 +90,7 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
                 val response = repository.getCourseObstacles(courseId)
                 if (response.isSuccessful) {
                     _obstacles.value = response.body() ?: emptyList()
+                    _currentObstacle.value = _obstacles.value[0]
                 } else {
                     Log.e("ArbitrationViewModel", "Erreur API : ${response.code()} - ${response.message()}")
                 }
@@ -144,22 +151,50 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
     }
 
     // Enregistrer la performance d'un compétiteur sur un obstacle
-    fun registerPerformance(time: Double, hasFell: Boolean) {
+
+    // Avancer à l'obstacle suivant
+    fun moveToNextObstacle(elapsedTime: Long) {
+        val currentObstacle = _currentObstacle.value ?: return
+        val currentIndex = _obstacles.value.indexOf(currentObstacle)
+
+        // Enregistrer la performance pour l'obstacle actuel
+        registerPerformance(elapsedTime.toInt() / 1000, hasFell = false) // Convertir ms en secondes
+
+        if (currentIndex < _obstacles.value.size - 1) {
+            // Passer à l'obstacle suivant
+            _currentObstacle.value = _obstacles.value[currentIndex + 1]
+        } else {
+            // Dernier obstacle - créer la performance finale
+            createFinalPerformance()
+        }
+    }
+
+    private fun createFinalPerformance() {
         viewModelScope.launch {
             try {
-                val currentObstacle = _currentObstacle.value ?: return@launch
-                val performance = PerformanceObstacleCreate(
-                    obstacleId = currentObstacle.id,
-                    performanceId = 1,  // À ajuster avec l'ID réel de la performance
-                    hasFell = if (hasFell) 1 else 0,
-                    toVerify = 1,
-                    time = time
+                val competitorId = _selectedCompetitorId.value ?: return@launch
+                Log.d("ArbitrationViewModel", competitorId.toString())
+                val courseId = _selectedCourseId.value ?: return@launch
+                Log.d("ArbitrationViewModel", courseId.toString())
+                // Calculer le temps total
+                val totalTime = _performanceObstacles.value.sumOf { it.time }
+                Log.d("ArbitrationViewModel", totalTime.toString())
+
+                val performance = PerformanceCreate(
+                    competitorId = competitorId,
+                    courseId = courseId,
+                    status = "to_finish",
+                    totalTime = totalTime
                 )
-                val response = repository.addPerformanceObstacle(performance)
+
+                Log.d("ArbitrationViewModel", performance.status + performance.courseId + performance.totalTime + performance.competitorId)
+
+                val response = repository.createPerformance(performance)
                 if (response.isSuccessful) {
-                    Log.d("ArbitrationViewModel", "Performance ajoutée avec succès")
+                    _performanceId = response.body()?.id
+                    Log.d("ArbitrationViewModel", "Performance finale créée avec succès")
                 } else {
-                    Log.e("ArbitrationViewModel", "Erreur lors de l'ajout de la performance")
+                    Log.e("ArbitrationViewModel", "Erreur lors de la création de la performance finale ${response.code()} - ${response.errorBody()?.string()}" )
                 }
             } catch (e: Exception) {
                 Log.e("ArbitrationViewModel", "Erreur API : ${e.message}")
@@ -167,11 +202,40 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
         }
     }
 
-    // Avancer à l'obstacle suivant
-    fun moveToNextObstacle() {
-        val currentIndex = _obstacles.value.indexOf(_currentObstacle.value)
-        if (currentIndex in _obstacles.value.indices && currentIndex < _obstacles.value.size - 1) {
-            _currentObstacle.value = _obstacles.value[currentIndex + 1]
+    fun registerPerformance(time: Int, hasFell: Boolean) {
+        viewModelScope.launch {
+            try {
+                val currentObstacle = _currentObstacle.value ?: return@launch
+                val performanceObstacle = PerformanceObstacleCreate(
+                    obstacleId = currentObstacle.id,
+                    performanceId = _performanceId ?: 0, // 0 si pas encore créé
+                    hasFell = if (hasFell) 1 else 0,
+                    toVerify = 1,
+                    time = time
+                )
+
+                // Stocker localement
+                _performanceObstacles.value += PerformanceObstacle(
+                    id = 0, // temporaire
+                    obstacleId = currentObstacle.id,
+                    performanceId = _performanceId ?: 0,
+                    hasFell = if (hasFell) 1 else 0,
+                    toVerify = 1,
+                    time = time,
+                    createdAt = "",
+                    updatedAt = ""
+                )
+
+                // Envoyer au serveur si performanceId existe
+                if (_performanceId != null) {
+                    val response = repository.addPerformanceObstacle(performanceObstacle)
+                    if (response.isSuccessful) {
+                        Log.d("ArbitrationViewModel", "PerformanceObstacle ajoutée avec succès")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ArbitrationViewModel", "Erreur : ${e.message}")
+            }
         }
     }
 
