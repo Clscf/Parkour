@@ -4,12 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,12 +18,13 @@ fun CreateCompetitionView(
     viewModel: CompetitionViewModel,
     navController: NavController
 ) {
-    val competitions by viewModel.competitions.collectAsState() // Liste des compétitions existantes
+    val competitions by viewModel.competitions.collectAsState()
 
     var name by remember { mutableStateOf("") }
-    var nameError by remember { mutableStateOf(false) } // Gérer l'erreur
-    var ageMin by remember { mutableStateOf(18) }
-    var ageMax by remember { mutableStateOf(30) }
+    var nameError by remember { mutableStateOf(false) }
+    var ageMin by remember { mutableStateOf("") }
+    var ageMax by remember { mutableStateOf("") }
+    var ageError by remember { mutableStateOf(false) }
     var gender by remember { mutableStateOf("Genre") }
     var expandedGender by remember { mutableStateOf(false) }
     var hasTry by remember { mutableStateOf(0) }
@@ -68,20 +64,36 @@ fun CreateCompetitionView(
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
-            value = ageMin.toString(),
-            onValueChange = { ageMin = it.toIntOrNull() ?: 18 },
+            value = ageMin,
+            onValueChange = {
+                ageMin = it.filter { char -> char.isDigit() }
+                ageError = (ageMin.toIntOrNull() ?: -1) >= (ageMax.toIntOrNull() ?: Int.MAX_VALUE)
+            },
             label = { Text("Âge minimum") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = ageError
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         TextField(
-            value = ageMax.toString(),
-            onValueChange = { ageMax = it.toIntOrNull() ?: 30 },
+            value = ageMax,
+            onValueChange = {
+                ageMax = it.filter { char -> char.isDigit() }
+                ageError = (ageMin.toIntOrNull() ?: -1) >= (ageMax.toIntOrNull() ?: Int.MAX_VALUE)
+            },
             label = { Text("Âge maximum") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            isError = ageError
         )
+
+        if (ageError) {
+            Text(
+                text = "L'âge minimum doit être inférieur à l'âge maximum",
+                color = Color.Red,
+                modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
@@ -151,25 +163,23 @@ fun CreateCompetitionView(
             onClick = {
                 val competition = CompetitionCreate(
                     name = name,
-                    ageMin = ageMin,
-                    ageMax = ageMax,
+                    ageMin = ageMin.toIntOrNull() ?: 0,
+                    ageMax = ageMax.toIntOrNull() ?: 0,
                     gender = gender,
                     hasRetry = hasTry
                 )
                 viewModel.addCompetition(competition)
                 navController.popBackStack()
             },
-            enabled = !nameError && name.isNotBlank(), // Désactive si le nom est invalide
+            enabled = name.isNotBlank() && !nameError &&
+                    ageMin.toIntOrNull() != null && ageMax.toIntOrNull() != null && !ageError,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Créer la compétition")
         }
 
-        Button(onClick = {
-            navController.popBackStack()
-        }) {
+        Button(onClick = { navController.popBackStack() }) {
             Text("Retour")
         }
     }
 }
-

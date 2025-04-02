@@ -73,7 +73,7 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                             var expandedCourseId by remember { mutableStateOf<Int?>(null) }
                             val courseObstacles by courseViewModel.courseObstacles.collectAsState()
 
-                            LazyColumn {
+                            LazyColumn(Modifier.height(300.dp)) {
                                 items(courses) { course ->
                                     Column {
                                         Row(
