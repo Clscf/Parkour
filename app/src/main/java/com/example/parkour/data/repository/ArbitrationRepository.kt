@@ -33,4 +33,9 @@ class ArbitrationRepository(private val apiService: ApiService) {
     suspend fun getCompetitorsForCompetition(competitionId: Int): Response<List<Competitor>> {
         return apiService.getCompetitionCompetitors(competitionId)
     }
+
+    suspend fun getCourseForCompetition(competitionId: Int): Response<List<Course>> {
+        return apiService.getCompetitionCourses(competitionId)
+    }
+
 }

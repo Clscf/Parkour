@@ -1,0 +1,48 @@
+ Spacer(modifier = Modifier.height(16.dp))
+        if (selectedCompetition != null) {
+            Text("Sélectionner un compétiteur")
+            ExposedDropdownMenuBox(
+                expanded = expandedCompetitor,
+                onExpandedChange = { expandedCompetitor = it }
+            ) {
+                OutlinedTextField(
+                    value = selectedCompetitor?.firstName ?: "Aucune sélection",
+                    onValueChange = {},
+                    label = { Text("Compétiteur") },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCompetitor) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expandedCompetitor = !expandedCompetitor } // Ajouter l'événement de clic ici aussi
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedCompetitor,
+                    onDismissRequest = { expandedCompetitor = false }
+                ) {
+                    if (competitors.isNotEmpty()) {
+                        competitors.forEach { competitor ->
+                            DropdownMenuItem(
+                                text = { Text(competitor.firstName) },
+                                onClick = {
+                                    selectedCompetitor = competitor
+                                    expandedCompetitor = false
+                                    viewModel.selectCompetitor(competitor.id)
+
+                                    // Optionnel : Charger les obstacles liés à la compétition
+                                    selectedCompetition?.let { competition ->
+                                        viewModel.loadCourseForCompetition(competition.id)
+                                    }
+                                }
+                            )
+                        }
+                    } else {
+                        DropdownMenuItem(
+                            text = { Text("Aucun compétiteur disponible") },
+                            enabled = false,
+                            onClick = {}
+                        )
+                    }
+                }
+            }
+        }

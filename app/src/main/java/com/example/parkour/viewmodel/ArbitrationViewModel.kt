@@ -42,17 +42,18 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
             try {
                 val response = repository.getCompetitions()
                 if (response.isSuccessful) {
-                    Log.d("CompetitionViewModel", "Réponse brute : ${response.body()?.toString()}")
-                    _competitions.value = response.body() ?: emptyList()
+                    val competitionsList = response.body() ?: emptyList()
+                    Log.d("ArbitrationViewModel", "Compétitions récupérées: $competitionsList")
+                    _competitions.value = competitionsList
                 } else {
-                    Log.e("CompetitionViewModel", "Erreur : ${response.errorBody()?.string()}")
+                    Log.e("ArbitrationViewModel", "Erreur API : ${response.code()} - ${response.message()}")
                 }
             } catch (e: Exception) {
-                Log.e("CompetitionViewModel", "Erreur API :", e)
-                _competitions.value = emptyList()  // Si une erreur se produit, vider la liste pour éviter un comportement inattendu.
+                Log.e("ArbitrationViewModel", "Erreur API : ${e.message}")
             }
         }
     }
+
 
 
     // Charger les compétiteurs pour une compétition spécifique
@@ -119,6 +120,8 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
     // Sélectionner un compétiteur
     fun selectCompetitor(competitorId: Int) {
         _selectedCompetitorId.value = competitorId
+        _selectedCourseId.value?.let { courseId ->
+            loadObstacles(courseId) }
     }
 
     // Enregistrer la performance d'un compétiteur sur un obstacle
@@ -152,4 +155,28 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
             _currentObstacle.value = _obstacles.value[currentIndex + 1]
         }
     }
+
+    fun loadCourseForCompetition(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCourseForCompetition(competitionId)
+                if (response.isSuccessful) {
+                    val courses = response.body() ?: emptyList()
+                    if (courses.isNotEmpty()) {
+                        val selectedCourse = courses.first()
+                        _selectedCourseId.value = selectedCourse.id
+                        //loadObstacles(selectedCourse.id)
+                    } else {
+                        Log.e("ArbitrationViewModel", "Aucun parcours trouvé pour cette compétition")
+                    }
+                } else {
+                    Log.e("ArbitrationViewModel", "Erreur lors de la récupération des parcours")
+                }
+            } catch (e: Exception) {
+                Log.e("ArbitrationViewModel", "Erreur API : ${e.message}")
+            }
+        }
+    }
+
+
 }
