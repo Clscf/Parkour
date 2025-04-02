@@ -45,6 +45,8 @@ fun ArbitrationView(
 
     var expandedCourse by remember { mutableStateOf(false) }
     var selectedCourse by remember { mutableStateOf<Course?>(null) }
+    var fallCount by remember { mutableStateOf(0) }
+
 
 
     LaunchedEffect(isTimerRunning) {
@@ -225,7 +227,8 @@ fun ArbitrationView(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             // Start from zero
-            Button(onClick = {
+            Button(enabled = fallCount<2,
+                onClick = {
                 elapsedTime = 0L
                 lastPausedTime = 0L
                 isPaused = false
@@ -235,7 +238,7 @@ fun ArbitrationView(
             }
 
             // Pause the timer
-            Button(onClick = {
+            Button(enabled = fallCount<2,onClick = {
                 isTimerRunning = false
                 isPaused = true
                 lastPausedTime = elapsedTime
@@ -258,7 +261,7 @@ fun ArbitrationView(
             }
 
             // Stop the timer completely
-            Button(onClick = {
+            Button(enabled = fallCount<2,onClick = {
                 isTimerRunning = false
                 elapsedTime = 0L
                 lastPausedTime = 0L
@@ -271,15 +274,36 @@ fun ArbitrationView(
 
         // Chute button (kept as in original code)
         Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            viewModel.registerPerformance(elapsedTime.toInt(), hasFell = true)
+        Button(enabled = fallCount<2,onClick = {
+            fallCount++
+
+            if (fallCount >= 2) {
+                // Si le compétiteur chute une deuxième fois, on arrête avec le statut "defection"
+                viewModel.createFinalPerformance(status = "defection")
+                elapsedTime = 0L
+                lastPausedTime = 0L
+                isTimerRunning = false
+                viewModel.stopTimer()
+
+            } else {
+                // Première chute → réinitialisation du timer et enregistrement de la chute
+                elapsedTime = 0L
+                lastPausedTime = 0L
+                isTimerRunning = true
+                viewModel.registerPerformance(0, hasFell = true)
+                viewModel.startTimer { time ->
+                    elapsedTime = lastPausedTime + time
+                }
+            }
         }) {
             Text("Chute")
         }
 
+
+
         // Obstacle suivant
         Spacer(modifier = Modifier.height(16.dp))
-        Button(
+        Button(enabled = fallCount<2,
             onClick = {
                 viewModel.moveToNextObstacle(elapsedTime)
                 elapsedTime = 0L // Réinitialiser le timer pour le prochain obstacle

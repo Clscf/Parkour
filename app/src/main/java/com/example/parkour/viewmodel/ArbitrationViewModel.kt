@@ -169,38 +169,33 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
         }
     }
 
-    private fun createFinalPerformance() {
+    fun createFinalPerformance(status: String = "to_finish") {
         viewModelScope.launch {
             try {
                 val competitorId = _selectedCompetitorId.value ?: return@launch
-                Log.d("ArbitrationViewModel", competitorId.toString())
                 val courseId = _selectedCourseId.value ?: return@launch
-                Log.d("ArbitrationViewModel", courseId.toString())
-                // Calculer le temps total
                 val totalTime = _performanceObstacles.value.sumOf { it.time }
-                Log.d("ArbitrationViewModel", totalTime.toString())
 
                 val performance = PerformanceCreate(
                     competitorId = competitorId,
                     courseId = courseId,
-                    status = "to_finish",
+                    status = status,
                     totalTime = totalTime
                 )
-
-                Log.d("ArbitrationViewModel", performance.status + performance.courseId + performance.totalTime + performance.competitorId)
 
                 val response = repository.createPerformance(performance)
                 if (response.isSuccessful) {
                     _performanceId = response.body()?.id
-                    Log.d("ArbitrationViewModel", "Performance finale créée avec succès")
+                    Log.d("ArbitrationViewModel", "Performance enregistrée avec statut : $status")
                 } else {
-                    Log.e("ArbitrationViewModel", "Erreur lors de la création de la performance finale ${response.code()} - ${response.errorBody()?.string()}" )
+                    Log.e("ArbitrationViewModel", "Erreur API : ${response.code()} - ${response.errorBody()?.string()}")
                 }
             } catch (e: Exception) {
                 Log.e("ArbitrationViewModel", "Erreur API : ${e.message}")
             }
         }
     }
+
 
     fun registerPerformance(time: Int, hasFell: Boolean) {
         viewModelScope.launch {
