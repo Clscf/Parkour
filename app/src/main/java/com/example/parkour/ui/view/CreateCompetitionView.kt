@@ -42,7 +42,7 @@ fun CreateCompetitionView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        TextField(
+        OutlinedTextField(
             value = name,
             onValueChange = {
                 name = it
@@ -63,7 +63,7 @@ fun CreateCompetitionView(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
+        OutlinedTextField(
             value = ageMin,
             onValueChange = {
                 ageMin = it.filter { char -> char.isDigit() }
@@ -76,7 +76,7 @@ fun CreateCompetitionView(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        TextField(
+        OutlinedTextField(
             value = ageMax,
             onValueChange = {
                 ageMax = it.filter { char -> char.isDigit() }
