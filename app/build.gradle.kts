@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -73,6 +74,8 @@ dependencies {
     implementation(libs.androidx.junit.ktx)
     implementation(libs.core)
     implementation(libs.androidx.media3.common.ktx)
+
+    kapt("androidx.room:room-compiler:2.5.2")
 
     // Tests
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0") // API JUnit Jupiter

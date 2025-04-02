@@ -7,8 +7,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @Entity
-data class CourseObstacle(
-    @PrimaryKey val id: Int,
-    @SerialName("obstacle_name") val obstacleName: String,
-    val position: Int
+data class SyncEntity(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val entityType: String,
+    val entityId: Int,
+    val action: String
 )
