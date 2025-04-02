@@ -111,23 +111,37 @@ fun ArbitrationView(
         Spacer(modifier = Modifier.height(16.dp))
         if (selectedCompetition != null) {
             Text("Sélectionner un compétiteur")
-            Spacer(modifier = Modifier.height(16.dp))
+            ExposedDropdownMenuBox(
+                expanded = expandedCompetitor,
+                onExpandedChange = { expandedCompetitor = it }
+            ) {
+                OutlinedTextField(
+                    value = selectedCompetitor?.firstName ?: "Aucune sélection",
+                    onValueChange = {},
+                    label = { Text("Compétiteur") },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCompetitor) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                        .clickable { expandedCompetitor = !expandedCompetitor }
+                )
 
-            // Liste des compétiteurs sous forme de boutons
-            if (competitors.isNotEmpty()) {
-                competitors.forEach { competitor ->
-                    Button(
-                        onClick = {
-                            selectedCompetitor = competitor
-                            viewModel.selectCompetitor(competitor.id)
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(8.dp)
-                    ) {
-                        Text(competitor.firstName) // Affichage du nom du compétiteur
+                ExposedDropdownMenu(
+                    expanded = expandedCompetitor,
+                    onDismissRequest = { expandedCompetitor = false }
+                ) {
+                    competitors.forEach { competitor ->
+                        DropdownMenuItem(
+                            text = { Text(competitor.firstName) },
+                            onClick = {
+                                selectedCompetitor = competitor
+                                expandedCompetitor = false
+                                viewModel.selectCompetitor(competitor.id)
+                            }
+                        )
                     }
                 }
-            } else {
-                Text("Aucun compétiteur disponible", style = MaterialTheme.typography.bodyMedium)
             }
         }
 
