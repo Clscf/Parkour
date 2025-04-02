@@ -134,7 +134,9 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                     }
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        Button(onClick = { navController.navigate("arbitration/${competition!!.id}/1") }) {
+                        Button(onClick = {
+                            navController.navigate("arbitration/${competitionId}")
+                        }) {
                             Text("Arbitrer")
                         }
                     }

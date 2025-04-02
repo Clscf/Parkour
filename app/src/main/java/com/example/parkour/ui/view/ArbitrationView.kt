@@ -20,7 +20,8 @@ import com.example.parkour.viewmodel.ArbitrationViewModel
 @Composable
 fun ArbitrationView(
     viewModel: ArbitrationViewModel,
-    navController: NavController
+    navController: NavController,
+    competitionId: Int
 ) {
     val competitions by viewModel.competitions.collectAsState()
     val competitors by viewModel.competitors.collectAsState()
@@ -37,20 +38,38 @@ fun ArbitrationView(
     var expandedCompetitor by remember { mutableStateOf(false) }
     var selectedCompetitor by remember { mutableStateOf<Competitor?>(null) }
 
+
+
+    LaunchedEffect(Unit) {
+        viewModel.loadCompetitions()
+    }
+
+
+    LaunchedEffect(competitionId, competitions) {
+        selectedCompetition = competitions.find { it.id == competitionId }
+        selectedCompetition?.let {
+            viewModel.loadCompetitorsForCompetition(it.id)
+            // Réinitialiser le compétiteur sélectionné si ce n'est plus dans cette compétition
+            if (selectedCompetitor != null && competitors.none { it.id == selectedCompetitor?.id }) {
+                selectedCompetitor = null // Réinitialiser si le compétiteur n'est pas dans la nouvelle compétition
+            }
+        }
+    }
+
+
+    // Charger les compétiteurs lorsque la compétition est sélectionnée
+    LaunchedEffect(selectedCompetition) {
+        selectedCompetition?.let {
+            viewModel.loadCompetitorsForCompetition(it.id)
+        }
+    }
+
     LaunchedEffect(isTimerRunning) {
         viewModel.loadCompetitions()
         if (isTimerRunning) {
             viewModel.startTimer { time ->
                 elapsedTime = lastPausedTime + time
             }
-        }
-    }
-
-
-    // Charger les compétiteurs après la sélection de la compétition
-    LaunchedEffect(selectedCompetition) {
-        selectedCompetition?.let {
-            viewModel.loadCompetitorsForCompetition(it.id)
         }
     }
 
@@ -85,23 +104,14 @@ fun ArbitrationView(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                if (competitions.isNotEmpty()) {
-                    competitions.forEach { competition ->
-                        DropdownMenuItem(
-                            text = { Text(competition.name) },
-                            onClick = {
-                                selectedCompetition = competition
-                                expanded = false
-                                viewModel.loadCompetitorsForCompetition(competition.id)
-                                //viewModel.loadCourseForCompetition(competition.id)
-                            }
-                        )
-                    }
-                } else {
+                competitions.forEach { competition ->
                     DropdownMenuItem(
-                        text = { Text("Aucune compétition disponible") },
-                        enabled = false,
-                        onClick = {}
+                        text = { Text(competition.name) },
+                        onClick = {
+                            selectedCompetition = competition
+                            expanded = false
+                            viewModel.loadCompetitorsForCompetition(competition.id)
+                        }
                     )
                 }
             }

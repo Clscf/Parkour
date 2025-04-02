@@ -94,20 +94,21 @@ fun AppNavigation() {
 
         // Page arbitrage
         composable(
-            "arbitration/{competitionId}/{courseId}",
+            "arbitration/{competitionId}",
             arguments = listOf(
-                navArgument("competitionId") { type = NavType.IntType },
-                navArgument("courseId") { type = NavType.IntType }
+                navArgument("competitionId") { type = NavType.IntType }
             )
         ) { backStackEntry ->
             val competitionId = backStackEntry.arguments?.getInt("competitionId") ?: return@composable
-            val courseId = backStackEntry.arguments?.getInt("courseId") ?: return@composable
 
             ArbitrationView(
                 viewModel = arbitrationViewModel,
                 navController = navController,
+                competitionId = competitionId // Passer uniquement competitionId
             )
         }
+
+
         composable("createCourse/{competitionId}") { backStackEntry ->
             val competitionId = backStackEntry.arguments?.getString("competitionId")?.toIntOrNull() ?: 0
             CreateCourseView(competitionViewModel, navController, competitionId)
