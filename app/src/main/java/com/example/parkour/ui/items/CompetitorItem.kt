@@ -42,8 +42,10 @@ fun CompetitorItem(
             }
 
             Row {
-                IconButton(onClick = { showDialog = true }) {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
+                if (isAlreadyAdded) {
+                    IconButton(onClick = { showDialog = true }) {
+                        Icon(imageVector = Icons.Default.Delete, contentDescription = "Supprimer", tint = Color.Red)
+                    }
                 }
             }
 

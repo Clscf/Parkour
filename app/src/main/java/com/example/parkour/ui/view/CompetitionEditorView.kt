@@ -41,7 +41,10 @@ import com.example.parkour.viewmodel.CourseViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: CourseViewModel, navController: NavController, competitionId: Int) {
-    LaunchedEffect(competitionId) {
+
+    var coursesChanged by remember { mutableStateOf(false) }
+
+    LaunchedEffect(competitionId, coursesChanged) {
         viewModel.getCompetitionById(competitionId)
         viewModel.loadCoursesForCompetition(competitionId)
         viewModel.loadCompetitionCompetitors(competitionId)
@@ -90,12 +93,10 @@ fun CompetitionEditorView(viewModel: CompetitionViewModel, courseViewModel: Cour
                         CourseItem(
                             course = course,
                             onEdit = {
-                                viewModel.loadCoursesForCompetition(competitionId)
                                 navController.navigate("updateCourse/${course.id}") },
                             onDelete = {
                                 courseViewModel.deleteCourse(course.id, competitionId)
-                                viewModel.loadCoursesForCompetition(competitionId)
-                                // 🔄 Actualisation après suppression
+                                coursesChanged = !coursesChanged
                             }
                         )
                     }

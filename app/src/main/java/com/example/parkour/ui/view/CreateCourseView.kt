@@ -15,6 +15,8 @@ fun CreateCourseView(viewModel: CompetitionViewModel, navController: NavControll
     var name by remember { mutableStateOf("") }
     var maxDuration by remember { mutableStateOf("") }
 
+    val isFormValid = name.isNotBlank() && maxDuration.isNotBlank() && maxDuration.toIntOrNull() != null
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -26,44 +28,54 @@ fun CreateCourseView(viewModel: CompetitionViewModel, navController: NavControll
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Champ pour le nom du parcours
         TextField(
             value = name,
             onValueChange = { name = it },
             label = { Text("Nom du parcours") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
+        // Champ pour la durée maximale (uniquement des chiffres)
         TextField(
             value = maxDuration,
             onValueChange = { maxDuration = it.filter { char -> char.isDigit() } },
             label = { Text("Durée maximale (secondes)") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Bouton Ajouter désactivé tant que le formulaire n'est pas valide
         Button(
             onClick = {
                 val course = CourseCreate(
                     name = name,
-                    maxDuration = maxDuration.toIntOrNull() ?: 0,
+                    maxDuration = maxDuration.toInt(),
                     competitionId = competitionId
                 )
                 viewModel.addCourse(course)
                 navController.popBackStack()
             },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = isFormValid
         ) {
             Text("Ajouter la course")
         }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Button(onClick = { navController.popBackStack() }) {
+        Button(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
             Text("Annuler")
         }
     }
 }
+
 

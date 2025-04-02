@@ -16,7 +16,6 @@ import com.example.parkour.viewmodel.CourseViewModel
 import com.example.parkour.viewmodel.ObstacleViewModel
 import com.example.parkour.ui.items.ObstacleItem  // Importer l'ObstacleItem
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleViewModel: ObstacleViewModel, navController: NavController) {
     val courses = courseViewModel.courses.collectAsState().value
@@ -25,17 +24,23 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
     val obstacleassocie = courseViewModel.courseObstacles.collectAsState().value
 
     // Définir les variables d'état pour le nom et la durée de la course
-    var courseName by remember { mutableStateOf(course?.name ?: "") }
-    var maxDuration by remember { mutableStateOf(course?.maxDuration?.toString() ?: "") }
+    var courseName by remember { mutableStateOf("") }
+    var maxDuration by remember { mutableStateOf("") }
 
-    // Charger les obstacles de la course
+    // Mettre à jour les champs lorsque la course est chargée
+    LaunchedEffect(course) {
+        if (course != null) {
+            courseName = course.name
+            maxDuration = course.maxDuration.toString()
+        }
+    }
+
     LaunchedEffect(courseId) {
         courseViewModel.loadCourses()
         courseViewModel.loadObstaclesForCourse(courseId)
-        obstacleViewModel.loadAllObstacles() // Charger tous les obstacles existants
+        obstacleViewModel.loadAllObstacles()
     }
 
-    // Si la course est trouvée, afficher l'interface
     if (course != null) {
         Scaffold(
             content = { innerPadding ->
@@ -52,8 +57,8 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                     // Nom de la course
                     OutlinedTextField(
-                        value = courseName,  // Utilisez courseName pour lier l'état
-                        onValueChange = { courseName = it },  // Met à jour courseName lorsqu'une modification est faite
+                        value = courseName,
+                        onValueChange = { courseName = it },
                         label = { Text("Nom de la course") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -62,42 +67,49 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                     // Durée maximale de la course
                     OutlinedTextField(
-                        value = maxDuration,  // Utilisez maxDuration pour lier l'état
-                        onValueChange = { maxDuration = it },  // Met à jour maxDuration lorsqu'une modification est faite
+                        value = maxDuration,
+                        onValueChange = { maxDuration = it.filter { char -> char.isDigit() } }, // Filtrage des chiffres
                         label = { Text("Durée maximale (minutes)") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(26.dp))
 
+                    // Affichage des obstacles associés
                     Text("Obstacles Associés :", style = MaterialTheme.typography.bodyLarge)
 
-                    // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
-                    LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 200.dp) // Limite de hauteur
-                    ) {
-                        items(obstacleassocie) { obstacle ->
-                            CourseObstacleItem(
-                                obstacle = obstacle,
-                                onDelete = {
-                                    val obstacleId = obstacles.find { it.name == obstacle.obstacleName }?.id
-                                    if (obstacleId != null) {
-                                        courseViewModel.removeObstacleFromCourse(
-                                            courseId,
-                                            obstacleId
-                                        )
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    if (obstacleassocie.isEmpty()) {
+                        Text(
+                            text = "Aucun obstacle associé pour le moment.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.padding(8.dp)
+                        )
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 200.dp)
+                        ) {
+                            items(obstacleassocie) { obstacle ->
+                                CourseObstacleItem(
+                                    obstacle = obstacle,
+                                    onDelete = {
+                                        val obstacleId = obstacles.find { it.name == obstacle.obstacleName }?.id
+                                        if (obstacleId != null) {
+                                            courseViewModel.removeObstacleFromCourse(courseId, obstacleId)
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
 
-                    // Affichage des obstacles disponibles
+                    Spacer(modifier = Modifier.height(30.dp))
+
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Text("Obstacles Disponibles :", style = MaterialTheme.typography.bodyLarge)
                         Button(onClick = { navController.navigate("create_obstacle_view/$courseId") }) {
@@ -109,29 +121,22 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                         obstacleassocie.none { it.obstacleName == obstacleDispo.name }
                     }
 
-
-                    // Limiter la taille de la LazyColumn pour éviter qu'elle prenne trop de place
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 200.dp)
+                            .heightIn(max = 300.dp)
                     ) {
                         items(obstaclesDisponibles) { obstacle ->
                             ObstacleItem(
                                 obstacle = obstacle,
-                                onAdd = {
-                                    courseViewModel.addObstacleToCourse(courseId, obstacle)
-                                }
+                                onAdd = { courseViewModel.addObstacleToCourse(courseId, obstacle) }
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
 
-
-
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Boutons de sauvegarde et annulation
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly
@@ -142,10 +147,9 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
 
                         Button(
                             onClick = {
-                                // Sauvegarder les changements de la course
                                 val updatedCourse = CourseUpdate(
-                                    name = courseName,  // Utilisez courseName ici
-                                    maxDuration = maxDuration.toIntOrNull() ?: course.maxDuration,  // Convertissez maxDuration en Int
+                                    name = courseName,
+                                    maxDuration = maxDuration.toIntOrNull() ?: course.maxDuration,
                                     position = course.position,
                                     isOver = course.isOver,
                                     competitionId = course.competitionId
@@ -154,14 +158,14 @@ fun UpdateCourseView(courseId: Int, courseViewModel: CourseViewModel, obstacleVi
                                 navController.popBackStack()
                             }
                         ) {
-                            Text("Retour")
+                            Text("Sauvegarder")
                         }
                     }
                 }
             }
         )
     } else {
-        // Si la course n'est pas trouvée
         Text("Course introuvable", style = MaterialTheme.typography.bodyLarge)
     }
 }
+
