@@ -24,6 +24,9 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
     private val _competitors = MutableStateFlow<List<Competitor>>(emptyList())
     val competitors: StateFlow<List<Competitor>> = _competitors
 
+    private val _courses = MutableStateFlow<List<Course>>(emptyList())
+    val courses: StateFlow<List<Course>> = _courses
+
     private val _obstacles = MutableStateFlow<List<CourseObstacle>>(emptyList())
     val obstacles: StateFlow<List<CourseObstacle>> = _obstacles
 
@@ -89,6 +92,22 @@ class ArbitrationViewModel(private val repository: ArbitrationRepository) : View
             }
         }
     }
+
+    fun loadCoursesForCompetition(competitionId: Int) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getCompetitionCourses(competitionId)
+                if (response.isSuccessful) {
+                    _courses.value = response.body() ?: emptyList()
+                } else {
+                    Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${response.code()} - ${response.message()}")
+                }
+            } catch (e: Exception) {
+                Log.e("CompetitionViewModel", "Erreur lors de la récupération des courses : ${e.message}")
+            }
+        }
+    }
+
 
     // Démarrer le chronomètre
     fun startTimer(onTick: (Long) -> Unit) {

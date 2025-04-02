@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.example.parkour.data.model.CourseObstacle
 
 @Composable
-fun CourseObstacleItem(obstacle: CourseObstacle, onDelete: () -> Unit) {
+fun CourseObstacleItem(obstacle: CourseObstacle?, onDelete: () -> Unit) {
     var showDialog by remember { mutableStateOf(false) }
     Card(
         shape = RoundedCornerShape(8.dp),
@@ -35,7 +35,7 @@ fun CourseObstacleItem(obstacle: CourseObstacle, onDelete: () -> Unit) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column {
-                Text(text = "Nom : ${obstacle.obstacleName}", style = MaterialTheme.typography.titleMedium)
+                Text(text = "Nom : ${obstacle?.obstacleName}", style = MaterialTheme.typography.titleMedium)
             }
             Row {
                 IconButton(onClick = { showDialog = true }) {

@@ -13,6 +13,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.data.model.Competition
 import com.example.parkour.data.model.Competitor
+import com.example.parkour.data.model.Course
+import com.example.parkour.data.model.CourseObstacle
+import com.example.parkour.data.model.Obstacle
+import com.example.parkour.ui.items.CourseObstacleItem
 import com.example.parkour.viewmodel.ArbitrationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -24,6 +28,7 @@ fun ArbitrationView(
 ) {
     val competitions by viewModel.competitions.collectAsState()
     val competitors by viewModel.competitors.collectAsState()
+    val courses by viewModel.courses.collectAsState()
     val obstacles by viewModel.obstacles.collectAsState()
 
     var elapsedTime by remember { mutableStateOf(0L) }
@@ -36,6 +41,11 @@ fun ArbitrationView(
 
     var expandedCompetitor by remember { mutableStateOf(false) }
     var selectedCompetitor by remember { mutableStateOf<Competitor?>(null) }
+
+    var expandedCourse by remember { mutableStateOf(false) }
+    var selectedCourse by remember { mutableStateOf<Course?>(null) }
+
+    var currentObstacle by remember { mutableStateOf<CourseObstacle?>(null)}
 
     LaunchedEffect(isTimerRunning) {
         viewModel.loadCompetitions()
@@ -110,6 +120,7 @@ fun ArbitrationView(
         // Sélectionner un compétiteur
         Spacer(modifier = Modifier.height(16.dp))
         if (selectedCompetition != null) {
+            val competitionId = selectedCompetition!!.id
             Text("Sélectionner un compétiteur")
             ExposedDropdownMenuBox(
                 expanded = expandedCompetitor,
@@ -138,6 +149,7 @@ fun ArbitrationView(
                                 selectedCompetitor = competitor
                                 expandedCompetitor = false
                                 viewModel.selectCompetitor(competitor.id)
+                                viewModel.loadCoursesForCompetition(competitionId)
                             }
                         )
                     }
@@ -146,6 +158,56 @@ fun ArbitrationView(
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
+
+        //Sélectionner une course
+        if (selectedCompetitor != null) {
+            Text("Sélectionner un parcours")
+            ExposedDropdownMenuBox(
+                expanded = expandedCourse,
+                onExpandedChange = { expandedCourse = it }
+            ) {
+                OutlinedTextField(
+                    value = selectedCourse?.name ?: "Aucune sélection",
+                    onValueChange = {},
+                    label = { Text("Parcours") },
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCourse) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor()
+                        .clickable { expandedCourse = !expandedCourse }
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expandedCourse,
+                    onDismissRequest = { expandedCourse = false }
+                ) {
+                    courses.forEach { course ->
+                        DropdownMenuItem(
+                            text = { Text(course.name) },
+                            onClick = {
+                                selectedCourse = course
+                                expandedCourse = false
+                                viewModel.selectCourse(course.id)
+                                viewModel.loadObstacles(course.id)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Liste des obstacles
+        Text(text = "Obstacle actuel ", style = MaterialTheme.typography.bodyLarge)
+        CourseObstacleItem(currentObstacle, onDelete = {})
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { navController.popBackStack() }) {
+            Text("Retour")
+        }
 
         // Timer
         Text(
@@ -224,16 +286,6 @@ fun ArbitrationView(
             Text("Obstacle suivant")
         }
 
-        // Liste des obstacles
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Liste des obstacles", style = MaterialTheme.typography.bodyLarge)
-        obstacles.forEach { obstacle ->
-            Text(text = "- Obstacle ID: ${obstacle.id}")
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = { navController.popBackStack() }) {
-            Text("Retour")
-        }
     }
 }
