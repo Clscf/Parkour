@@ -24,7 +24,7 @@ import androidx.compose.ui.graphics.Color
 
 
 @Composable
-fun SimpleBottomNavigation(navController: NavController) {
+fun SimpleBottomNavigation(navController: NavController, isEditor: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,29 +54,29 @@ fun SimpleBottomNavigation(navController: NavController) {
                 )
             }
         }
-
-        // Icône Créer
-        IconButton(onClick = { navController.navigate("createCompetition") }) {
-            Column(
-                modifier = Modifier.padding(vertical = 4.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Créer",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = "Créer",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1
-                )
+        if (isEditor){
+            // Icône Créer
+            IconButton(onClick = { navController.navigate("createCompetition") }) {
+                Column(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Créer",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "Créer",
+                        color = Color.White,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1
+                    )
+                }
             }
         }
-
         // Icône Arbitrage
         IconButton(onClick = { navController.navigate("arbitration/1/1") }) {
             Column(

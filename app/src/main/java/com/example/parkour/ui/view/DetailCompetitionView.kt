@@ -46,7 +46,6 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                 }
             )
         },
-        bottomBar = { SimpleBottomNavigation(navController = navController) },
     ) { innerPadding ->
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

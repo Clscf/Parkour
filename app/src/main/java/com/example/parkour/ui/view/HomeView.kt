@@ -1,18 +1,22 @@
 package com.example.parkour.ui.view
 
-
 import CompetitionItem
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.parkour.ui.viewmodel.CompetitionViewModel
@@ -21,10 +25,11 @@ import com.example.parkour.data.model.Competition
 @Composable
 fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
     val competitions = viewModel.competitions.collectAsState().value
+    var isEditing by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = { SimpleBottomNavigation(navController = navController) }
+        bottomBar = { SimpleBottomNavigation(navController = navController, isEditing) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -34,6 +39,11 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Bouton toggle mode éditeur
+            EditorModeToggle(isEditing) { newState ->
+                isEditing = newState
+            }
+
             Text(
                 text = "Compétitions disponibles",
                 style = MaterialTheme.typography.headlineSmall,
@@ -45,10 +55,51 @@ fun HomeView(viewModel: CompetitionViewModel, navController: NavController) {
             } else {
                 LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(competitions) { competition ->
-                        CompetitionItem(competition, navController)
+                        CompetitionItem(competition, navController, isEditing)
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun EditorModeToggle(isEditing: Boolean, onToggle: (Boolean) -> Unit) {
+    var isChecked by remember { mutableStateOf(isEditing) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable {
+                isChecked = !isChecked
+                onToggle(isChecked)
+            }
+            .padding(8.dp)
+    ) {
+        Text(
+            text = if (isChecked) "Mode Édition: ON" else "Mode Édition: OFF",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box(
+            modifier = Modifier
+                .width(50.dp)
+                .height(30.dp)
+                .clip(RoundedCornerShape(15.dp))
+                .background(if (isChecked) Color.Blue else Color.Gray)
+                .padding(horizontal = 4.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(22.dp)
+                    .offset(x = if (isChecked) 20.dp else 0.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .animateContentSize()
+            )
         }
     }
 }

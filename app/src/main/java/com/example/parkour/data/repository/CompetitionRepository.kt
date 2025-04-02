@@ -32,7 +32,6 @@ class CompetitionRepository(private val apiService: ApiService) {
     }
 
 
-
     suspend fun deleteCompetition(id: Int): Response<Unit> {
         return apiService.deleteCompetition(id)
     }
