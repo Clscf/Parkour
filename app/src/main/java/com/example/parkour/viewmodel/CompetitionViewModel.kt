@@ -241,6 +241,16 @@ class CompetitionViewModel(private val repository: CompetitionRepository) : View
     }
 
 
+        private val _isEditing = MutableStateFlow(false)
+        val isEditing: StateFlow<Boolean> get() = _isEditing
+
+        fun setEditing(editing: Boolean) {
+            _isEditing.value = editing
+        }
+
+
+
+
 
 
 

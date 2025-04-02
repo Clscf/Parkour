@@ -27,6 +27,7 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
     val competitors by viewModel.competitors.collectAsState()
     var isLoading by remember { mutableStateOf(true) }
 
+
     LaunchedEffect(competitionId) {
         viewModel.getCompetitionById(competitionId)
         viewModel.loadCoursesForCompetition(competitionId)
@@ -45,8 +46,7 @@ fun DetailCompetitionView(viewModel: CompetitionViewModel, courseViewModel: Cour
                     }
                 }
             )
-        },
-        bottomBar = { SimpleBottomNavigation(navController = navController) },
+        }
     ) { innerPadding ->
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

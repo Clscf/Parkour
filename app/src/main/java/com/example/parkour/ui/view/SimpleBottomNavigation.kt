@@ -16,21 +16,25 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.compose.ui.graphics.Color
-
+import androidx.compose.runtime.collectAsState
+import com.example.parkour.ui.viewmodel.CompetitionViewModel
 
 @Composable
-fun SimpleBottomNavigation(navController: NavController) {
+fun SimpleBottomNavigation(navController: NavController, viewModel: CompetitionViewModel) {
+    val isEditing by viewModel.isEditing.collectAsState()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = MaterialTheme.colorScheme.primary)
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+            .background(color = MaterialTheme.colorScheme.secondary)
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Icône Accueil
@@ -44,19 +48,19 @@ fun SimpleBottomNavigation(navController: NavController) {
                     imageVector = Icons.Default.Home,
                     contentDescription = "Accueil",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(28.dp)
                 )
                 Text(
                     text = "Accueil",
                     color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1
                 )
             }
         }
 
-        // Icône Créer
-        IconButton(onClick = { navController.navigate("createCompetition") }) {
+        // Icône Créer (désactivé en mode éditeur)
+        IconButton(onClick = { if (!isEditing) navController.navigate("createCompetition") }, enabled = !isEditing) {
             Column(
                 modifier = Modifier.padding(vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,13 +69,13 @@ fun SimpleBottomNavigation(navController: NavController) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Créer",
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    tint = if (isEditing) Color.Gray else Color.White,
+                    modifier = Modifier.size(28.dp)
                 )
                 Text(
                     text = "Créer",
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (isEditing) Color.Gray else Color.White,
+                    style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1
                 )
             }
@@ -88,12 +92,12 @@ fun SimpleBottomNavigation(navController: NavController) {
                     imageVector = Icons.Default.Check,
                     contentDescription = "Arbitrage",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(28.dp)
                 )
                 Text(
                     text = "Arbitrage",
                     color = Color.White,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     maxLines = 1
                 )
             }
